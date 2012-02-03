@@ -43,6 +43,8 @@
 %% 370 - 377    ø - ÿ        lowercase
 %%
 
+%% make a change test
+
 -module(erlide_scan).
 
 -export([string/1,string_ws/1,string/2,tokens/3,tokens_ws/3,
