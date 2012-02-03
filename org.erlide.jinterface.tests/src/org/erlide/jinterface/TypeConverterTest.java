@@ -225,7 +225,7 @@ public class TypeConverterTest {
     @Test
     public void cvtConvertible_2() throws SignatureException {
         final Object x = "hej";
-        final OtpErlangObject obj = new OtpErlangAtom("hej d�");
+        final OtpErlangObject obj = new OtpErlangAtom("hej");
         final Object y = TypeConverter.erlang2java(obj, Cvt.class);
         assertTrue(x.equals(y));
     }

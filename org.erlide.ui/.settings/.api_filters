@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.erlide.ui" version="2">
+    <resource path="src/org/erlide/ui/util/ErlideSelection.java" type="org.erlide.ui.util.ErlideSelection">
+        <filter comment="todo" id="338792546">
+            <message_arguments>
+                <message_argument value="org.erlide.ui.util.ErlideSelection"/>
+                <message_argument value="extractActivationToken(IDocument, int, boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
