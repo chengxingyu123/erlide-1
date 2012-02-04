@@ -195,6 +195,14 @@
             id="org.erlide.ui.views.navigator.view"
             name="Erlang Navigator">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.erlide.views"
+            class="org.erlide.ui.views.objectlist.ObjectListView"
+            icon="icons/erl/erlang-notext016.gif"
+            id="org.erlide.ui.views.objectlist.ObjectListView"
+            name="Object list view">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">

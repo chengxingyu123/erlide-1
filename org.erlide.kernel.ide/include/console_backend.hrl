@@ -22,3 +22,9 @@
 	 runtime=0,
 	 cf,
 	 mq=0}).
+
+-record(pool_info,
+	{name,
+	 counter=0,
+	 max,
+	 queue}).

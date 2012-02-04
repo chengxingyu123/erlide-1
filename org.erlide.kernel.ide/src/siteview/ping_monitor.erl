@@ -12,17 +12,21 @@ extends () -> atomic_monitor .
 ping_monitor(Self, Name)->
 	?SETVALUE(timeout,1000),
 	?SETVALUE(size,4),	
-	?SETVALUE(name,Name),
+	?SETVALUE(name,Name),	
 	object:super(Self, [Name]).
 
 ping_monitor_(Self)->eresye:stop(?VALUE(name)).
 
 
-init_action(Self,EventType,Pattern,State) ->
+init(Self,EventType,Pattern,State) ->
 	io:format ( "[~w]:Type=~w,Action=update,State=~w,Event=~w,Pattern=~w\n",	[?VALUE(name),?MODULE,State,EventType,Pattern]),
 	object:do(Self,waiting).
 
 get_max() -> 10.  %max number of this type of monitor can be run in parallel
+
+do_pong(Self,EventType,Pattern,State) ->
+	io:format ( "[~w]:Type=~w,Action=update,State=~w,Event=~w,Pattern=~w\n",	[?VALUE(name),?MODULE,State,EventType,Pattern]),
+	object:do(Self,start).
 
 update(Self,EventType,Pattern,State) ->
 %% 	io:format ( "[~w]:Type=~w,Action=update,State=~w,Event=~w,Pattern=~w\n",	[?VALUE(name),?MODULE,State,EventType,Pattern]),

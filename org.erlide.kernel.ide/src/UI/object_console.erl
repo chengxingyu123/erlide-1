@@ -32,6 +32,7 @@
 	 notebook,
 	 main_panel,
 	 pro_panel,
+	 pool_panel,
 	 object_panel,
 	 tv_panel,
 	 sys_panel,
@@ -144,6 +145,10 @@ setup(#state{frame = Frame} = State) ->
     ProPanel = console_obj_wx:start_link(Notebook, self()),
     wxNotebook:addPage(Notebook, ProPanel, "Objects", []),
 
+    %% Resource Pool Panel
+    PoolPanel = console_pool_wx:start_link(Notebook, self()),
+    wxNotebook:addPage(Notebook, PoolPanel, "Pool", []),
+	
     DefaultPanelPid = wx_object:get_pid(ProPanel),
     DefaultPanelPid ! {active, node()},
     UpdState = State#state{main_panel = Panel,
@@ -152,6 +157,7 @@ setup(#state{frame = Frame} = State) ->
 			   status_bar = StatusBar,
 			   sys_panel = SysPanel,
 			   pro_panel = ProPanel,
+			   pool_panel = PoolPanel,
 			   active_tab = DefaultPanelPid,
 			   node  = node(),
 			   nodes = Nodes
@@ -394,13 +400,14 @@ check_page_title(Notebook) ->
     Selection = wxNotebook:getSelection(Notebook),
     wxNotebook:getPageText(Notebook, Selection).
 
-get_active_pid(#state{notebook=Notebook, pro_panel=Pro, object_panel=Object,sys_panel=Sys,
+get_active_pid(#state{notebook=Notebook, pro_panel=Pro, pool_panel=Pool,object_panel=Object,sys_panel=Sys,
 		      tv_panel=Tv, trace_panel=Trace, app_panel=App}) ->
     Panel = case check_page_title(Notebook) of
 		"Objects" -> Pro;
 		?OBJECT_STR -> Object;		
 		"System" -> Sys;
 		"Table Viewer" -> Tv;
+		"Pool" -> Pool;
 		?TRACE_STR -> Trace;
 		"Applications" -> App
 	    end,

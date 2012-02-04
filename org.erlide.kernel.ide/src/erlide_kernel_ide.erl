@@ -7,6 +7,7 @@
 init() ->	
 	spawn(fun()->
 				  erlide_scanner_listener:start(),
+				  object:start(),
 				  ok
 		  end),
 	ok.

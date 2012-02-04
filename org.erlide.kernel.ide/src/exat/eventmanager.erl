@@ -55,6 +55,7 @@ acl_event(Sync, Agent, Pattern, Proc) ->
     object:call(Sync, signal, [{acl, Message, Proc}]).
 
 eres_event(Sync, Agent, {Engine, read, Pattern}, Proc) ->
+	io:format("[~w:~w] ~w~n.", [?MODULE,?LINE,{Sync, Agent, {Engine, read, Pattern}, Proc}]),
     Data = eresye:wait(Engine, Pattern),
     object:call(Sync, signal, [{eres, Data, Proc}]);
 

@@ -10,6 +10,8 @@
 %% 		3. object store in the form of KB, allows flexible query
 %% @end
 %%
+%%TODO: create monitors to monitor the health condition of object
+
 -module(object).
 -compile(export_all).
 -include("object.hrl").
@@ -30,8 +32,6 @@ start()->start_link().
 %%
 new(Class,P) ->
 %% 	io:format("[~w:~w]Parameter is:~w~n", [?MODULE,?LINE,P]),
-%% 	[Name|_] = P, 
-%% 	Name = erlang:element(1, P),
     PropertyServerPid = spawn(object, property_server, [dict:new()]),
     server_call(PropertyServerPid,
                 {self(), set, ?PROPERTY_STATUS, ?INIT_STATUS}),
@@ -292,12 +292,22 @@ getParent(Class) ->
 
 
 %%
-%% get the attributes of the object
+%% get the attribute names of the object
 %%
 getAttributeNames(Object) when is_atom(Object) -> getAttributeNames(get_by_name(Object));
 getAttributeNames(Object) when is_record(Object,object) ->
     lists:sort(server_call(Object#object.property_server, {self(), list})).
 
+%%
+%% get the attributes of the object
+%%
+isAttribute(Object,AttrName) when is_atom(Object) -> isAttribute(get_by_name(Object),AttrName);
+isAttribute(Object,AttrName) when is_record(Object,object) ->
+    lists:member(AttrName,server_call(Object#object.property_server, {self(), list})).
+
+%%
+%% get the attributes of the object
+%%
 getAttributes(Object) when is_atom(Object) -> getAttributes(get_by_name(Object));
 getAttributes(Object) when is_record(Object,object) ->
     lists:sort(server_call(Object#object.property_server, {self(), list_values})).
@@ -370,7 +380,7 @@ call_a_method(Object, Method, Class, Params, NameFun) ->
 
 	%%test if MethodName is a function of the Class module
 	IsMethod = lists:member({MethodName,erlang:length(Params)+1},get_methods(Class)) orelse %for user defined method
-				lists:member(MethodName,[extends,Class,Class ++ "_"]) ,  % for system methonds
+				lists:member(MethodName,[extends,Class,list_to_atom(atom_to_list(Class) ++ "_")]) ,  % for system methonds
 
 	case IsMethod of
 		true -> 

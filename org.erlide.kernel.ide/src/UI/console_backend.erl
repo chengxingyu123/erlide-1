@@ -173,6 +173,21 @@ get_table_list(mnesia, Opts) ->
     lists:foldl(Info, [], mnesia:system_info(tables)).
 
 %%
+%% resource pool backend
+%%
+pool_collect(Collector) ->
+    PoolInfo = pool_collect(object:get_defined_attrs(pool),[]),
+    Collector ! {self(),PoolInfo}.
+
+pool_collect([Pool|Pools], Acc) ->
+	{Name,{Counter,Queue}} = Pool,
+	Max = erlang:apply(Name, get_max, []),
+    PoolInfo = #pool_info{name=Name,counter=Counter,max=Max,queue=queue:to_list(Queue)},
+	object_collect(Pools, [PoolInfo|Acc]);
+pool_collect([], Acc) -> Acc.
+
+
+%%
 %% object backend
 %%
 object_collect(Collector) ->
