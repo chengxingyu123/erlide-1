@@ -30,6 +30,6 @@ public class OtpErlangDecodeException extends OtpErlangException {
      * Provides a detailed message.
      */
     public OtpErlangDecodeException(final String msg) {
-        super(msg);
+	super(msg);
     }
 }

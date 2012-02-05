@@ -32,34 +32,34 @@ public class OtpLocalNode extends AbstractNode {
     protected java.net.Socket epmd;
 
     protected OtpLocalNode() {
-        super();
-        init();
+	super();
+	init();
     }
 
     /**
      * Create a node with the given name and the default cookie.
      */
     protected OtpLocalNode(final String node) {
-        super(node);
-        init();
+	super(node);
+	init();
     }
 
     /**
      * Create a node with the given name and cookie.
      */
     protected OtpLocalNode(final String node, final String cookie) {
-        super(node, cookie);
-        init();
+	super(node, cookie);
+	init();
     }
 
     private void init() {
-        serial = 0;
-        pidCount = 1;
-        portCount = 1;
-        refId = new int[3];
-        refId[0] = 1;
-        refId[1] = 0;
-        refId[2] = 0;
+	serial = 0;
+	pidCount = 1;
+	portCount = 1;
+	refId = new int[3];
+	refId[0] = 1;
+	refId[1] = 0;
+	refId[2] = 0;
     }
 
     /**
@@ -68,17 +68,17 @@ public class OtpLocalNode extends AbstractNode {
      * @return the port number this server node is accepting connections on.
      */
     public int port() {
-        return port;
+	return port;
     }
 
     /**
      * Set the Epmd socket after publishing this nodes listen port to Epmd.
      * 
      * @param s
-     *            The socket connecting this node to Epmd.
+     *                The socket connecting this node to Epmd.
      */
     protected void setEpmd(final java.net.Socket s) {
-        epmd = s;
+	epmd = s;
     }
 
     /**
@@ -87,7 +87,7 @@ public class OtpLocalNode extends AbstractNode {
      * @return The socket connecting this node to Epmd.
      */
     protected java.net.Socket getEpmd() {
-        return epmd;
+	return epmd;
     }
 
     /**
@@ -98,20 +98,20 @@ public class OtpLocalNode extends AbstractNode {
      * @return an Erlang pid.
      */
     public synchronized OtpErlangPid createPid() {
-        final OtpErlangPid p = new OtpErlangPid(node, pidCount, serial,
-                creation);
+	final OtpErlangPid p = new OtpErlangPid(node, pidCount, serial,
+		creation);
 
-        pidCount++;
-        if (pidCount > 0x7fff) {
-            pidCount = 0;
+	pidCount++;
+	if (pidCount > 0x7fff) {
+	    pidCount = 0;
 
-            serial++;
-            if (serial > 0x1fff) { /* 13 bits */
-                serial = 0;
-            }
-        }
+	    serial++;
+	    if (serial > 0x1fff) { /* 13 bits */
+		serial = 0;
+	    }
+	}
 
-        return p;
+	return p;
     }
 
     /**
@@ -124,14 +124,14 @@ public class OtpLocalNode extends AbstractNode {
      * @return an Erlang port.
      */
     public synchronized OtpErlangPort createPort() {
-        final OtpErlangPort p = new OtpErlangPort(node, portCount, creation);
+	final OtpErlangPort p = new OtpErlangPort(node, portCount, creation);
 
-        portCount++;
-        if (portCount > 0xfffffff) { /* 28 bits */
-            portCount = 0;
-        }
+	portCount++;
+	if (portCount > 0xfffffff) { /* 28 bits */
+	    portCount = 0;
+	}
 
-        return p;
+	return p;
     }
 
     /**
@@ -143,19 +143,19 @@ public class OtpLocalNode extends AbstractNode {
      * @return an Erlang reference.
      */
     public synchronized OtpErlangRef createRef() {
-        final OtpErlangRef r = new OtpErlangRef(node, refId, creation);
+	final OtpErlangRef r = new OtpErlangRef(node, refId, creation);
 
-        // increment ref ids (3 ints: 18 + 32 + 32 bits)
-        refId[0]++;
-        if (refId[0] > 0x3ffff) {
-            refId[0] = 0;
+	// increment ref ids (3 ints: 18 + 32 + 32 bits)
+	refId[0]++;
+	if (refId[0] > 0x3ffff) {
+	    refId[0] = 0;
 
-            refId[1]++;
-            if (refId[1] == 0) {
-                refId[2]++;
-            }
-        }
+	    refId[1]++;
+	    if (refId[1] == 0) {
+		refId[2]++;
+	    }
+	}
 
-        return r;
+	return r;
     }
 }

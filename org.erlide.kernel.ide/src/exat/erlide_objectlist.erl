@@ -31,8 +31,8 @@ init(_EventSinkPid) ->
 %% original author: Luke Gorrie
 
 object_list() ->	
-	[pinfo(Pid) || Pid <- processes()].
-%% 	[info(Object) || Object <- object:get_all()].
+%% 	[pinfo(Pid) || Pid <- processes()].
+	[info(Object) || Object <- object:get_all()].
 
 
 info(Object) ->

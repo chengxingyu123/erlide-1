@@ -47,8 +47,7 @@ import java.io.IOException;
  * 
  * @see OtpSelf
  * 
- * @deprecated the functionality of this class has been moved to {@link OtpSelf}
- *             .
+ * @deprecated the functionality of this class has been moved to {@link OtpSelf}.
  */
 @Deprecated
 public class OtpServer extends OtpSelf {
@@ -56,14 +55,14 @@ public class OtpServer extends OtpSelf {
      * Create an {@link OtpServer} from an existing {@link OtpSelf}.
      * 
      * @param self
-     *            an existing self node.
+     *                an existing self node.
      * 
      * @exception java.io.IOException
-     *                if a ServerSocket could not be created.
+     *                    if a ServerSocket could not be created.
      * 
      */
     public OtpServer(final OtpSelf self) throws IOException {
-        super(self.node(), self.cookie());
+	super(self.node(), self.cookie());
     }
 
     /**
@@ -72,40 +71,40 @@ public class OtpServer extends OtpSelf {
      * method.
      * 
      * @param node
-     *            the name of the node.
+     *                the name of the node.
      * 
      * @param cookie
-     *            the authorization cookie that will be used by this node when
-     *            accepts connections from remote nodes.
+     *                the authorization cookie that will be used by this node
+     *                when accepts connections from remote nodes.
      * 
      * @exception java.io.IOException
-     *                if a ServerSocket could not be created.
+     *                    if a ServerSocket could not be created.
      * 
      */
     public OtpServer(final String node, final String cookie) throws IOException {
-        super(node, cookie);
+	super(node, cookie);
     }
 
     /**
      * Create an OtpServer, using the specified port number.
      * 
      * @param node
-     *            a name for this node, as above.
+     *                a name for this node, as above.
      * 
      * @param cookie
-     *            the authorization cookie that will be used by this node when
-     *            accepts connections from remote nodes.
+     *                the authorization cookie that will be used by this node
+     *                when accepts connections from remote nodes.
      * 
      * @param port
-     *            the port number to bind the socket to.
+     *                the port number to bind the socket to.
      * 
      * @exception java.io.IOException
-     *                if a ServerSocket could not be created or if the chosen
-     *                port number was not available.
+     *                    if a ServerSocket could not be created or if the
+     *                    chosen port number was not available.
      * 
      */
     public OtpServer(final String node, final String cookie, final int port)
-            throws IOException {
-        super(node, cookie, port);
+	    throws IOException {
+	super(node, cookie, port);
     }
 }

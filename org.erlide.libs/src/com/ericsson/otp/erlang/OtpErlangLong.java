@@ -24,14 +24,14 @@ import java.math.BigInteger;
 /**
  * Provides a Java representation of Erlang integral types. Erlang does not
  * distinguish between different integral types, however this class and its
- * subclasses {@link OtpErlangByte}, {@link OtpErlangChar}, {@link OtpErlangInt}
- * , and {@link OtpErlangShort} attempt to map the Erlang types onto the various
- * Java integral types. Two additional classes, {@link OtpErlangUInt} and
- * {@link OtpErlangUShort} are provided for Corba compatibility. See the
- * documentation for IC for more information.
+ * subclasses {@link OtpErlangByte}, {@link OtpErlangChar},
+ * {@link OtpErlangInt}, and {@link OtpErlangShort} attempt to map the Erlang
+ * types onto the various Java integral types. Two additional classes,
+ * {@link OtpErlangUInt} and {@link OtpErlangUShort} are provided for Corba
+ * compatibility. See the documentation for IC for more information.
  */
 public class OtpErlangLong extends OtpErlangObject implements Serializable,
-        Cloneable {
+	Cloneable {
     // don't change this!
     static final long serialVersionUID = 1610466859236755096L;
 
@@ -42,27 +42,27 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * Create an Erlang integer from the given value.
      * 
      * @param l
-     *            the long value to use.
+     *                the long value to use.
      */
     public OtpErlangLong(final long l) {
-        val = l;
+	val = l;
     }
 
     /**
      * Create an Erlang integer from the given value.
      * 
      * @param val
-     *            the long value to use.
+     *                the long value to use.
      */
     public OtpErlangLong(final BigInteger v) {
-        if (v == null) {
-            throw new java.lang.NullPointerException();
-        }
-        if (v.bitLength() < 64) {
-            val = v.longValue();
-        } else {
-            bigVal = v;
-        }
+	if (v == null) {
+	    throw new java.lang.NullPointerException();
+	}
+	if (v.bitLength() < 64) {
+	    val = v.longValue();
+	} else {
+	    bigVal = v;
+	}
     }
 
     /**
@@ -70,20 +70,20 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * Erlang external format.
      * 
      * @param buf
-     *            the stream containing the encoded value.
+     *                the stream containing the encoded value.
      * 
      * @exception OtpErlangDecodeException
-     *                if the buffer does not contain a valid external
-     *                representation of an Erlang integer.
+     *                    if the buffer does not contain a valid external
+     *                    representation of an Erlang integer.
      */
     public OtpErlangLong(final OtpInputStream buf)
-            throws OtpErlangDecodeException {
-        final byte[] b = buf.read_integer_byte_array();
-        try {
-            val = OtpInputStream.byte_array_to_long(b, false);
-        } catch (final OtpErlangDecodeException e) {
-            bigVal = new BigInteger(b);
-        }
+	    throws OtpErlangDecodeException {
+	final byte[] b = buf.read_integer_byte_array();
+	try {
+	    val = OtpInputStream.byte_array_to_long(b, false);
+	} catch (final OtpErlangDecodeException e) {
+	    bigVal = new BigInteger(b);
+	}
     }
 
     /**
@@ -92,11 +92,11 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the value of this number, as a BigInteger.
      */
     public BigInteger bigIntegerValue() {
-        if (bigVal != null) {
-            return bigVal;
-        } else {
-            return BigInteger.valueOf(val);
-        }
+	if (bigVal != null) {
+	    return bigVal;
+	} else {
+	    return BigInteger.valueOf(val);
+	}
     }
 
     /**
@@ -107,11 +107,11 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the value of this number, as a long.
      */
     public long longValue() {
-        if (bigVal != null) {
-            return bigVal.longValue();
-        } else {
-            return val;
-        }
+	if (bigVal != null) {
+	    return bigVal.longValue();
+	} else {
+	    return val;
+	}
     }
 
     /**
@@ -120,13 +120,13 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return true if this value fits in a long, false otherwise.
      */
     public boolean isLong() {
-        // To just chech this.bigVal is a wee bit to simple, since
-        // there just might have be a mean bignum that arrived on
-        // a stream, and was a long disguised as more than 8 byte integer.
-        if (bigVal != null) {
-            return bigVal.bitLength() < 64;
-        }
-        return true;
+	// To just chech this.bigVal is a wee bit to simple, since
+	// there just might have be a mean bignum that arrived on
+	// a stream, and was a long disguised as more than 8 byte integer.
+	if (bigVal != null) {
+	    return bigVal.bitLength() < 64;
+	}
+	return true;
     }
 
     /**
@@ -138,12 +138,12 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      *         otherwise.
      */
     public boolean isULong() {
-        // Here we have the same problem as for isLong(), plus
-        // the whole range 1<<63 .. (1<<64-1) is allowed.
-        if (bigVal != null) {
-            return bigVal.signum() >= 0 && bigVal.bitLength() <= 64;
-        }
-        return val >= 0;
+	// Here we have the same problem as for isLong(), plus
+	// the whole range 1<<63 .. (1<<64-1) is allowed.
+	if (bigVal != null) {
+	    return bigVal.signum() >= 0 && bigVal.bitLength() <= 64;
+	}
+	return val >= 0;
     }
 
     /**
@@ -154,45 +154,45 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      *         this BigInteger, excluding a sign bit.
      */
     public int bitLength() {
-        if (bigVal != null) {
-            return bigVal.bitLength();
-        }
-        if (val == 0 || val == -1) {
-            return 0;
-        } else {
-            // Binary search for bit length
-            int i = 32; // mask length
-            long m = (1L << i) - 1; // AND mask with ones in little end
-            if (val < 0) {
-                m = ~m; // OR mask with ones in big end
-                for (int j = i >> 1; j > 0; j >>= 1) { // mask delta
-                    if ((val | m) == val) { // mask >= enough
-                        i -= j;
-                        m >>= j; // try less bits
-                    } else {
-                        i += j;
-                        m <<= j; // try more bits
-                    }
-                }
-                if ((val | m) != val) {
-                    i++; // mask < enough
-                }
-            } else {
-                for (int j = i >> 1; j > 0; j >>= 1) { // mask delta
-                    if ((val & m) == val) { // mask >= enough
-                        i -= j;
-                        m >>= j; // try less bits
-                    } else {
-                        i += j;
-                        m = m << j | m; // try more bits
-                    }
-                }
-                if ((val & m) != val) {
-                    i++; // mask < enough
-                }
-            }
-            return i;
-        }
+	if (bigVal != null) {
+	    return bigVal.bitLength();
+	}
+	if (val == 0 || val == -1) {
+	    return 0;
+	} else {
+	    // Binary search for bit length
+	    int i = 32; // mask length
+	    long m = (1L << i) - 1; // AND mask with ones in little end
+	    if (val < 0) {
+		m = ~m; // OR mask with ones in big end
+		for (int j = i >> 1; j > 0; j >>= 1) { // mask delta
+		    if ((val | m) == val) { // mask >= enough
+			i -= j;
+			m >>= j; // try less bits
+		    } else {
+			i += j;
+			m <<= j; // try more bits
+		    }
+		}
+		if ((val | m) != val) {
+		    i++; // mask < enough
+		}
+	    } else {
+		for (int j = i >> 1; j > 0; j >>= 1) { // mask delta
+		    if ((val & m) == val) { // mask >= enough
+			i -= j;
+			m >>= j; // try less bits
+		    } else {
+			i += j;
+			m = m << j | m; // try more bits
+		    }
+		}
+		if ((val & m) != val) {
+		    i++; // mask < enough
+		}
+	    }
+	    return i;
+	}
     }
 
     /**
@@ -201,11 +201,11 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return -1, 0 or 1 as the value is negative, zero or positive.
      */
     public int signum() {
-        if (bigVal != null) {
-            return bigVal.signum();
-        } else {
-            return val > 0 ? 1 : val < 0 ? -1 : 0;
-        }
+	if (bigVal != null) {
+	    return bigVal.signum();
+	} else {
+	    return val > 0 ? 1 : val < 0 ? -1 : 0;
+	}
     }
 
     /**
@@ -214,17 +214,17 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the value of this number, as an int.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as an int.
+     *                    if the value is too large to be represented as an int.
      */
     public int intValue() throws OtpErlangRangeException {
-        final long l = longValue();
-        final int i = (int) l;
+	final long l = longValue();
+	final int i = (int) l;
 
-        if (i != l) {
-            throw new OtpErlangRangeException("Value too large for int: " + val);
-        }
+	if (i != l) {
+	    throw new OtpErlangRangeException("Value too large for int: " + val);
+	}
 
-        return i;
+	return i;
     }
 
     /**
@@ -233,20 +233,20 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the value of this number, as an int.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as an int, or
-     *                if the value is negative.
+     *                    if the value is too large to be represented as an int,
+     *                    or if the value is negative.
      */
     public int uIntValue() throws OtpErlangRangeException {
-        final long l = longValue();
-        final int i = (int) l;
+	final long l = longValue();
+	final int i = (int) l;
 
-        if (i != l) {
-            throw new OtpErlangRangeException("Value too large for int: " + val);
-        } else if (i < 0) {
-            throw new OtpErlangRangeException("Value not positive: " + val);
-        }
+	if (i != l) {
+	    throw new OtpErlangRangeException("Value too large for int: " + val);
+	} else if (i < 0) {
+	    throw new OtpErlangRangeException("Value not positive: " + val);
+	}
 
-        return i;
+	return i;
     }
 
     /**
@@ -255,18 +255,19 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the value of this number, as a short.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as a short.
+     *                    if the value is too large to be represented as a
+     *                    short.
      */
     public short shortValue() throws OtpErlangRangeException {
-        final long l = longValue();
-        final short i = (short) l;
+	final long l = longValue();
+	final short i = (short) l;
 
-        if (i != l) {
-            throw new OtpErlangRangeException("Value too large for short: "
-                    + val);
-        }
+	if (i != l) {
+	    throw new OtpErlangRangeException("Value too large for short: "
+		    + val);
+	}
 
-        return i;
+	return i;
     }
 
     /**
@@ -275,21 +276,21 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the value of this number, as a short.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as a short, or
-     *                if the value is negative.
+     *                    if the value is too large to be represented as a
+     *                    short, or if the value is negative.
      */
     public short uShortValue() throws OtpErlangRangeException {
-        final long l = longValue();
-        final short i = (short) l;
+	final long l = longValue();
+	final short i = (short) l;
 
-        if (i != l) {
-            throw new OtpErlangRangeException("Value too large for short: "
-                    + val);
-        } else if (i < 0) {
-            throw new OtpErlangRangeException("Value not positive: " + val);
-        }
+	if (i != l) {
+	    throw new OtpErlangRangeException("Value too large for short: "
+		    + val);
+	} else if (i < 0) {
+	    throw new OtpErlangRangeException("Value not positive: " + val);
+	}
 
-        return i;
+	return i;
     }
 
     /**
@@ -298,18 +299,18 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the char value of this number.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as a char.
+     *                    if the value is too large to be represented as a char.
      */
     public char charValue() throws OtpErlangRangeException {
-        final long l = longValue();
-        final char i = (char) l;
+	final long l = longValue();
+	final char i = (char) l;
 
-        if (i != l) {
-            throw new OtpErlangRangeException("Value too large for char: "
-                    + val);
-        }
+	if (i != l) {
+	    throw new OtpErlangRangeException("Value too large for char: "
+		    + val);
+	}
 
-        return i;
+	return i;
     }
 
     /**
@@ -318,18 +319,18 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * @return the byte value of this number.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as a byte.
+     *                    if the value is too large to be represented as a byte.
      */
     public byte byteValue() throws OtpErlangRangeException {
-        final long l = longValue();
-        final byte i = (byte) l;
+	final long l = longValue();
+	final byte i = (byte) l;
 
-        if (i != l) {
-            throw new OtpErlangRangeException("Value too large for byte: "
-                    + val);
-        }
+	if (i != l) {
+	    throw new OtpErlangRangeException("Value too large for byte: "
+		    + val);
+	}
 
-        return i;
+	return i;
     }
 
     /**
@@ -339,27 +340,27 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      */
     @Override
     public String toString() {
-        if (bigVal != null) {
-            return "" + bigVal;
-        } else {
-            return "" + val;
-        }
+	if (bigVal != null) {
+	    return "" + bigVal;
+	} else {
+	    return "" + val;
+	}
     }
 
     /**
      * Convert this number to the equivalent Erlang external representation.
      * 
      * @param buf
-     *            an output stream to which the encoded number should be
-     *            written.
+     *                an output stream to which the encoded number should be
+     *                written.
      */
     @Override
     public void encode(final OtpOutputStream buf) {
-        if (bigVal != null) {
-            buf.write_big_integer(bigVal);
-        } else {
-            buf.write_long(val);
-        }
+	if (bigVal != null) {
+	    buf.write_big_integer(bigVal);
+	} else {
+	    buf.write_long(val);
+	}
     }
 
     /**
@@ -367,32 +368,32 @@ public class OtpErlangLong extends OtpErlangObject implements Serializable,
      * same value.
      * 
      * @param o
-     *            the number to compare to.
+     *                the number to compare to.
      * 
      * @return true if the numbers have the same value.
      */
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof OtpErlangLong)) {
-            return false;
-        }
+	if (!(o instanceof OtpErlangLong)) {
+	    return false;
+	}
 
-        final OtpErlangLong that = (OtpErlangLong) o;
+	final OtpErlangLong that = (OtpErlangLong) o;
 
-        if (bigVal != null && that.bigVal != null) {
-            return bigVal.equals(that.bigVal);
-        } else if (bigVal == null && that.bigVal == null) {
-            return val == that.val;
-        }
-        return false;
+	if (bigVal != null && that.bigVal != null) {
+	    return bigVal.equals(that.bigVal);
+	} else if (bigVal == null && that.bigVal == null) {
+	    return val == that.val;
+	}
+	return false;
     }
-
+    
     @Override
     protected int doHashCode() {
-        if (bigVal != null) {
-            return bigVal.hashCode();
-        } else {
-            return BigInteger.valueOf(val).hashCode();
-        }
+	if (bigVal != null) {
+	    return bigVal.hashCode();
+	} else {
+	    return BigInteger.valueOf(val).hashCode();
+	}
     }
 }

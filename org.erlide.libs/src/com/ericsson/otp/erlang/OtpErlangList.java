@@ -18,9 +18,20 @@
  */
 package com.ericsson.otp.erlang;
 
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+
+import java.util.List;
+import java.util.Map;
+//import java.util.ArrayList;
+//import java.util.HashMap;
+
+import javolution.util.FastList;
+import javolution.util.FastMap;
+
 
 /**
  * Provides a Java representation of Erlang lists. Lists are created from zero
@@ -30,7 +41,7 @@ import java.util.NoSuchElementException;
  * The arity of the list is the number of elements it contains.
  */
 public class OtpErlangList extends OtpErlangObject implements
-        Iterable<OtpErlangObject>, Serializable, Cloneable {
+	Iterable<OtpErlangObject>, Serializable, Cloneable {
     // don't change this!
     static final long serialVersionUID = 5999112769036676548L;
 
@@ -44,26 +55,26 @@ public class OtpErlangList extends OtpErlangObject implements
      * Create an empty list.
      */
     public OtpErlangList() {
-        elems = NO_ELEMENTS;
+	elems = NO_ELEMENTS;
     }
 
     /**
-     * Create a list of Erlang integers representing Unicode codePoints. This
-     * method does not check if the string contains valid code points.
+     * Create a list of Erlang integers representing Unicode codePoints.
+     * This method does not check if the string contains valid code points.
      * 
      * @param str
      *            the characters from which to create the list.
      */
     public OtpErlangList(final String str) {
-        if (str == null || str.length() == 0) {
-            elems = NO_ELEMENTS;
-        } else {
-            final int[] codePoints = OtpErlangString.stringToCodePoints(str);
-            elems = new OtpErlangObject[codePoints.length];
-            for (int i = 0; i < elems.length; i++) {
-                elems[i] = new OtpErlangInt(codePoints[i]);
-            }
-        }
+	if (str == null || str.length() == 0) {
+	    elems = NO_ELEMENTS;
+	} else {
+	    final int[] codePoints = OtpErlangString.stringToCodePoints(str);
+	    elems = new OtpErlangObject[codePoints.length];
+	    for (int i = 0;  i < elems.length;  i++) {
+		elems[i] = new OtpErlangInt(codePoints[i]);
+	    }
+	}
     }
 
     /**
@@ -73,7 +84,7 @@ public class OtpErlangList extends OtpErlangObject implements
      *            the elememet to make the list from.
      */
     public OtpErlangList(final OtpErlangObject elem) {
-        elems = new OtpErlangObject[] { elem };
+	elems = new OtpErlangObject[] { elem };
     }
 
     /**
@@ -83,7 +94,24 @@ public class OtpErlangList extends OtpErlangObject implements
      *            the array of terms from which to create the list.
      */
     public OtpErlangList(final OtpErlangObject[] elems) {
-        this(elems, 0, elems.length);
+	this(elems, 0, elems.length);
+    }
+    
+    /**
+     * Create a list from an array of arbitrary Erlang terms.
+     * 
+     * @param elems
+     *            the array of terms from which to create the list.
+     */
+    public OtpErlangList(final Object[] elems) {
+    	if (elems != null) {
+    	    this.elems = new OtpErlangObject[elems.length];
+    	    for (int i=0;i < elems.length; i++) {
+    	    	this.elems[i] = OtpConverter.Object2OtpErlangObject(elems[i]);
+    	    };
+    	} else {
+    	    this.elems = NO_ELEMENTS;
+    	}
     }
 
     /**
@@ -96,12 +124,12 @@ public class OtpErlangList extends OtpErlangObject implements
      * @throws OtpErlangException
      */
     public OtpErlangList(final OtpErlangObject[] elems,
-            final OtpErlangObject lastTail) throws OtpErlangException {
-        this(elems, 0, elems.length);
-        if (elems.length == 0 && lastTail != null) {
-            throw new OtpErlangException("Bad list, empty head, non-empty tail");
-        }
-        this.lastTail = lastTail;
+	    final OtpErlangObject lastTail) throws OtpErlangException {
+	this(elems, 0, elems.length);
+	if (elems.length == 0 && lastTail != null) {
+	    throw new OtpErlangException("Bad list, empty head, non-empty tail");
+	}
+	this.lastTail = lastTail;
     }
 
     /**
@@ -115,13 +143,13 @@ public class OtpErlangList extends OtpErlangObject implements
      *            the number of terms to insert.
      */
     public OtpErlangList(final OtpErlangObject[] elems, final int start,
-            final int count) {
-        if (elems != null && count > 0) {
-            this.elems = new OtpErlangObject[count];
-            System.arraycopy(elems, start, this.elems, 0, count);
-        } else {
-            this.elems = NO_ELEMENTS;
-        }
+	    final int count) {
+	if (elems != null && count > 0) {
+	    this.elems = new OtpErlangObject[count];
+	    System.arraycopy(elems, start, this.elems, 0, count);
+	} else {
+	    this.elems = NO_ELEMENTS;
+	}
     }
 
     /**
@@ -136,23 +164,82 @@ public class OtpErlangList extends OtpErlangObject implements
      *                representation of an Erlang list.
      */
     public OtpErlangList(final OtpInputStream buf)
-            throws OtpErlangDecodeException {
-        final int arity = buf.read_list_head();
-        if (arity > 0) {
-            elems = new OtpErlangObject[arity];
-            for (int i = 0; i < arity; i++) {
-                elems[i] = buf.read_any();
-            }
-            /* discard the terminating nil (empty list) or read tail */
-            if (buf.peek1() == OtpExternal.nilTag) {
-                buf.read_nil();
-            } else {
-                lastTail = buf.read_any();
-            }
-        } else {
-            elems = NO_ELEMENTS;
-        }
+	    throws OtpErlangDecodeException {
+	final int arity = buf.read_list_head();
+	if (arity > 0) {
+	    elems = new OtpErlangObject[arity];
+	    for (int i = 0; i < arity; i++) {
+		elems[i] = buf.read_any();
+	    }
+	    /* discard the terminating nil (empty list) or read tail */
+	    if (buf.peek1() == OtpExternal.nilTag) {
+		buf.read_nil();
+	    } else {
+		lastTail = buf.read_any();
+	    }
+	} else {
+	    elems = NO_ELEMENTS;
+	}
     }
+    
+   
+    /**
+     * Create a list from an List<Object>.
+     * 
+     * @param list
+     *                the java list to create the list from.
+     * 
+     * @exception java.lang.IllegalArgumentException
+     *                    if the array is empty (null) or contains null
+     *                    elements.
+     */
+    public OtpErlangList(List<Object> list) {
+//    	List<OtpErlangObject> otplist=new ArrayList<OtpErlangObject>();
+    	List<OtpErlangObject> otplist=FastList.newInstance();
+    	if(list.size()<1) {
+    		elems = NO_ELEMENTS;
+    	} else {  
+    		try {
+	    		for(Object obj:list) {
+	    			otplist.add(OtpConverter.Object2OtpErlangObject(obj));					
+	    		}
+    		} catch (Exception e) {
+    			System.out.println(e);
+    		}
+    		elems = otplist.toArray(new OtpErlangObject[otplist.size()]);
+    	}
+    }
+    
+
+    
+    public OtpErlangList(Map<String,Object> map) {
+    	List<OtpErlangObject> erlList= FastList.newInstance();
+		for (Map.Entry<String, ?> entry: map.entrySet()) {
+//			Map<String,Object> submap =  new HashMap<String,Object>();
+			Map<String,Object> submap =  FastMap.newInstance();
+			if(entry.getKey().endsWith("Atom")) {//forced convert to otpatom, instead of otpstring
+				submap.put(entry.getKey(),new OtpErlangAtom(entry.getValue().toString()));
+			}
+			else if(OtpConverter.getAtomName().size()>0)  {//forced convert to OtpErlangAtom, instead of OtpErlangString
+				if (OtpConverter.getAtomName().contains(entry.getKey())) submap.put(entry.getKey(),new OtpErlangAtom(entry.getValue().toString()));
+				else submap.put(entry.getKey(),OtpConverter.Object2OtpErlangObject(entry.getValue()));
+			}
+			else {
+				submap.put(entry.getKey(),OtpConverter.Object2OtpErlangObject(entry.getValue()));
+//				submap.put(entry.getKey(),entry.getValue());
+			}
+			erlList.add(new OtpErlangTuple(submap));
+		}
+	
+		if (map.size() < 1) {
+			elems = NO_ELEMENTS;
+		} else {
+		    this.elems = erlList.toArray(new OtpErlangObject[map.size()]);
+		}
+    }
+    
+    
+
 
     /**
      * Get the arity of the list.
@@ -160,7 +247,7 @@ public class OtpErlangList extends OtpErlangObject implements
      * @return the number of elements contained in the list.
      */
     public int arity() {
-        return elems.length;
+	return elems.length;
     }
 
     /**
@@ -173,10 +260,10 @@ public class OtpErlangList extends OtpErlangObject implements
      * @return the requested element, of null if i is not a valid element index.
      */
     public OtpErlangObject elementAt(final int i) {
-        if (i >= arity() || i < 0) {
-            return null;
-        }
-        return elems[i];
+	if (i >= arity() || i < 0) {
+	    return null;
+	}
+	return elems[i];
     }
 
     /**
@@ -185,13 +272,13 @@ public class OtpErlangList extends OtpErlangObject implements
      * @return an array containing all of the list's elements.
      */
     public OtpErlangObject[] elements() {
-        if (arity() == 0) {
-            return NO_ELEMENTS;
-        } else {
-            final OtpErlangObject[] res = new OtpErlangObject[arity()];
-            System.arraycopy(elems, 0, res, 0, res.length);
-            return res;
-        }
+	if (arity() == 0) {
+	    return NO_ELEMENTS;
+	} else {
+	    final OtpErlangObject[] res = new OtpErlangObject[arity()];
+	    System.arraycopy(elems, 0, res, 0, res.length);
+	    return res;
+	}
     }
 
     /**
@@ -202,25 +289,25 @@ public class OtpErlangList extends OtpErlangObject implements
 
     @Override
     public String toString() {
-        return toString(0);
+	return toString(0);
     }
 
     protected String toString(final int start) {
-        final StringBuffer s = new StringBuffer();
-        s.append("[");
+	final StringBuffer s = new StringBuffer();
+	s.append("[");
 
-        for (int i = start; i < arity(); i++) {
-            if (i > start) {
-                s.append(",");
-            }
-            s.append(elems[i].toString());
-        }
-        if (lastTail != null) {
-            s.append("|").append(lastTail.toString());
-        }
-        s.append("]");
+	for (int i = start; i < arity(); i++) {
+	    if (i > start) {
+		s.append(",");
+	    }
+	    if (elems[i] != null) s.append(elems[i].toString());
+	}
+	if (lastTail != null) {
+	    s.append("|").append(lastTail.toString());
+	}
+	s.append("]");
 
-        return s.toString();
+	return s.toString();
     }
 
     /**
@@ -235,24 +322,24 @@ public class OtpErlangList extends OtpErlangObject implements
 
     @Override
     public void encode(final OtpOutputStream buf) {
-        encode(buf, 0);
+	encode(buf, 0);
     }
 
     protected void encode(final OtpOutputStream buf, final int start) {
-        final int arity = arity() - start;
+	final int arity = arity() - start;
 
-        if (arity > 0) {
-            buf.write_list_head(arity);
+	if (arity > 0) {
+	    buf.write_list_head(arity);
 
-            for (int i = start; i < arity + start; i++) {
-                buf.write_any(elems[i]);
-            }
-        }
-        if (lastTail == null) {
-            buf.write_nil();
-        } else {
-            buf.write_any(lastTail);
-        }
+	    for (int i = start; i < arity + start; i++) {
+		buf.write_any(elems[i]);
+	    }
+	}
+	if (lastTail == null) {
+	    buf.write_nil();
+	} else {
+	    buf.write_any(lastTail);
+	}
     }
 
     /**
@@ -269,239 +356,312 @@ public class OtpErlangList extends OtpErlangObject implements
     @Override
     public boolean equals(final Object o) {
 
-        /*
-         * Be careful to use methods even for "this", so that equals work also
-         * for sublists
-         */
+	/*
+	 * Be careful to use methods even for "this", so that equals work also
+	 * for sublists
+	 */
 
-        if (!(o instanceof OtpErlangList)) {
-            return false;
-        }
+	if (!(o instanceof OtpErlangList)) {
+	    return false;
+	}
 
-        final OtpErlangList l = (OtpErlangList) o;
+	final OtpErlangList l = (OtpErlangList) o;
 
-        final int a = arity();
-        if (a != l.arity()) {
-            return false;
-        }
-        for (int i = 0; i < a; i++) {
-            if (!elementAt(i).equals(l.elementAt(i))) {
-                return false; // early exit
-            }
-        }
-        final OtpErlangObject otherTail = l.getLastTail();
-        if (getLastTail() == null && otherTail == null) {
-            return true;
-        }
-        if (getLastTail() == null) {
-            return false;
-        }
-        return getLastTail().equals(l.getLastTail());
+	final int a = arity();
+	if (a != l.arity()) {
+	    return false;
+	}
+	for (int i = 0; i < a; i++) {
+	    if (!elementAt(i).equals(l.elementAt(i))) {
+		return false; // early exit
+	    }
+	}
+	final OtpErlangObject otherTail = l.getLastTail();
+	if (getLastTail() == null && otherTail == null) {
+	    return true;
+	}
+	if (getLastTail() == null) {
+	    return false;
+	}
+	return getLastTail().equals(l.getLastTail());
     }
 
     public OtpErlangObject getLastTail() {
-        return lastTail;
+	return lastTail;
     }
-
+    
     @Override
     protected int doHashCode() {
-        final OtpErlangObject.Hash hash = new OtpErlangObject.Hash(4);
-        final int a = arity();
-        if (a == 0) {
-            return (int) 3468870702L;
-        }
-        for (int i = 0; i < a; i++) {
-            hash.combine(elementAt(i).hashCode());
-        }
-        final OtpErlangObject t = getLastTail();
-        if (t != null) {
-            final int h = t.hashCode();
-            hash.combine(h, h);
-        }
-        return hash.valueOf();
+	OtpErlangObject.Hash hash = new OtpErlangObject.Hash(4);
+	final int a = arity();
+	if (a == 0) {
+	    return (int)3468870702L;
+	}
+	for (int i = 0; i < a; i++) {
+	    hash.combine(elementAt(i).hashCode());
+	}
+	final OtpErlangObject t = getLastTail();
+	if (t != null) {
+	    int h = t.hashCode();
+	    hash.combine(h, h);
+	}
+	return hash.valueOf();
     }
-
+    
     @Override
     public Object clone() {
-        try {
-            return new OtpErlangList(elements(), getLastTail());
-        } catch (final OtpErlangException e) {
-            throw new AssertionError(e);
-        }
+	try {
+	    return new OtpErlangList(elements(), getLastTail());
+	} catch (final OtpErlangException e) {
+	    return null;
+	}
     }
 
-    @Override
     public Iterator<OtpErlangObject> iterator() {
-        return iterator(0);
+	return iterator(0);
     }
 
     private Iterator<OtpErlangObject> iterator(final int start) {
-        return new Itr(start);
+	return new Itr(start);
     }
 
     /**
      * @return true if the list is proper, i.e. the last tail is nil
      */
     public boolean isProper() {
-        return lastTail == null;
+	return lastTail == null;
     }
 
     public OtpErlangObject getHead() {
-        if (arity() > 0) {
-            return elems[0];
-        }
-        return null;
+	if (arity() > 0) {
+	    return elems[0];
+	}
+	return null;
     }
 
     public OtpErlangObject getTail() {
-        return getNthTail(1);
+	return getNthTail(1);
     }
 
     public OtpErlangObject getNthTail(final int n) {
-        final int arity = arity();
-        if (arity >= n) {
-            if (arity == n && lastTail != null) {
-                return lastTail;
-            } else {
-                return new SubList(this, n);
-            }
-        }
-        return null;
+	final int arity = arity();
+	if (arity >= n) {
+	    if (arity == n && lastTail != null) {
+		return lastTail;
+	    } else {
+		return new SubList(this, n);
+	    }
+	}
+	return null;
     }
 
     /**
-     * Convert a list of integers into a Unicode string, interpreting each
-     * integer as a Unicode code point value.
+     * Convert a list of integers into a Unicode string,
+     * interpreting each integer as a Unicode code point value.
      * 
-     * @return A java.lang.String object created through its constructor
-     *         String(int[], int, int).
-     * 
+     * @return A java.lang.String object created through its
+     *         constructor String(int[], int, int).
+     *
      * @exception OtpErlangException
-     *                for non-proper and non-integer lists.
-     * 
+     *                    for non-proper and non-integer lists.
+     *
      * @exception OtpErlangRangeException
-     *                if any integer does not fit into a Java int.
-     * 
+     *                    if any integer does not fit into a Java int.
+     *
      * @exception java.security.InvalidParameterException
-     *                if any integer is not within the Unicode range.
-     * 
+     *                    if any integer is not within the Unicode range.
+     *
      * @see String#String(int[], int, int)
-     * 
+     *
      */
 
     public String stringValue() throws OtpErlangException {
-        if (!isProper()) {
-            throw new OtpErlangException("Non-proper list: " + this);
-        }
-        final int[] values = new int[arity()];
-        for (int i = 0; i < values.length; ++i) {
-            final OtpErlangObject o = elementAt(i);
-            if (!(o instanceof OtpErlangLong)) {
-                throw new OtpErlangException("Non-integer term: " + o);
-            }
-            final OtpErlangLong l = (OtpErlangLong) o;
-            values[i] = l.intValue();
-        }
-        return new String(values, 0, values.length);
+	if (! isProper()) {
+	    throw new OtpErlangException("Non-proper list: " + this);
+	}
+	final int[] values = new int[arity()];
+	for (int i = 0; i < values.length; ++i) {
+	    final OtpErlangObject o = elementAt(i);
+	    if (! (o instanceof OtpErlangLong)) {
+		throw new OtpErlangException("Non-integer term: " + o);
+	    }
+	    final OtpErlangLong l = (OtpErlangLong) o;
+	    values[i] = l.intValue();
+	}
+	return new String(values, 0, values.length);
     }
 
+
+    public String stringValue2() throws OtpErlangException {
+		if (! isProper()) {
+		    return null;
+		}
+		final int[] values = new int[arity()];
+		for (int i = 0; i < values.length; ++i) {
+		    final OtpErlangObject o = elementAt(i);
+		    if (! (o instanceof OtpErlangLong)) {
+		    	return null;
+		    }
+		    final OtpErlangLong l = (OtpErlangLong) o;
+		    values[i] = l.intValue();
+		}
+		return new String(values, 0, values.length);
+	 }
+    
+	
+	public List<Object> convertList() throws OtpErlangException {
+    	List<Object> list = FastList.newInstance();
+    	try {
+	    	for(OtpErlangObject elem : elems){    	
+				list.add(OtpConverter.OtpErlangObject2Object(elem));
+	    	}
+    	} catch (Exception e) {
+            return null;
+        }
+		return list;
+	}
+	
+	/**
+     * check if the list is a list of Tuple{string, Object}
+     * 
+     * @return true or false
+     */
+    
+    public boolean isMap() throws OtpErlangException{
+    	for(OtpErlangObject elem : elems){    	
+    		if (elem instanceof OtpErlangTuple) {				
+    			final OtpErlangTuple tuple = (OtpErlangTuple) elem;
+				if (tuple.isMap()) {continue; }
+				else {return false;}
+			} 
+			else return false;
+		}
+		return true;
+	}			
+	
+	public Map<String,Object> convertMap() throws OtpErlangException {
+		final int a = arity();
+    	Map<String,Object> map = FastMap.newInstance();
+    	try {
+        	for(OtpErlangObject elem : elems){
+	    		OtpErlangTuple kvPair = (OtpErlangTuple) elem;
+				// if key is atom else
+	    		if (kvPair.elementAt(0) instanceof OtpErlangAtom)  {	    			
+	    			OtpErlangAtom atom = (OtpErlangAtom) kvPair.elementAt(0) ; 
+	    			map.put(atom.atomValue(),OtpConverter.OtpErlangObject2Object(kvPair.elementAt(1)));
+	    		}
+	    		else if (kvPair.elementAt(0) instanceof OtpErlangString) {
+	    			OtpErlangString str = (OtpErlangString) kvPair.elementAt(0) ; 
+	    			map.put("\""+str.stringValue()+"\"",OtpConverter.OtpErlangObject2Object(kvPair.elementAt(1)));	    			
+	    		}
+	    		else {
+	    			map.putAll(kvPair.convertMap());
+	    		}
+	    	}
+	    	
+    	}catch (Exception e) {
+            //throw new OtpErlangException(e);
+//    		throw new ConversionException(e);
+    		return null;
+        }  
+		return map;		
+    }
+    
+
     public static class SubList extends OtpErlangList {
-        private static final long serialVersionUID = OtpErlangList.serialVersionUID;
+	private static final long serialVersionUID = OtpErlangList.serialVersionUID;
 
-        private final int start;
+	private final int start;
 
-        private final OtpErlangList parent;
+	private final OtpErlangList parent;
 
-        private SubList(final OtpErlangList parent, final int start) {
-            super();
-            this.parent = parent;
-            this.start = start;
-        }
+	private SubList(final OtpErlangList parent, final int start) {
+	    super();
+	    this.parent = parent;
+	    this.start = start;
+	}
 
-        @Override
-        public int arity() {
-            return parent.arity() - start;
-        }
+	@Override
+	public int arity() {
+	    return parent.arity() - start;
+	}
 
-        @Override
-        public OtpErlangObject elementAt(final int i) {
-            return parent.elementAt(i + start);
-        }
+	@Override
+	public OtpErlangObject elementAt(final int i) {
+	    return parent.elementAt(i + start);
+	}
 
-        @Override
-        public OtpErlangObject[] elements() {
-            final int n = parent.arity() - start;
-            final OtpErlangObject[] res = new OtpErlangObject[n];
-            for (int i = 0; i < res.length; i++) {
-                res[i] = parent.elementAt(i + start);
-            }
-            return res;
-        }
+	@Override
+	public OtpErlangObject[] elements() {
+	    final int n = parent.arity() - start;
+	    final OtpErlangObject[] res = new OtpErlangObject[n];
+	    for (int i = 0; i < res.length; i++) {
+		res[i] = parent.elementAt(i + start);
+	    }
+	    return res;
+	}
 
-        @Override
-        public boolean isProper() {
-            return parent.isProper();
-        }
+	@Override
+	public boolean isProper() {
+	    return parent.isProper();
+	}
 
-        @Override
-        public OtpErlangObject getHead() {
-            return parent.elementAt(start);
-        }
+	@Override
+	public OtpErlangObject getHead() {
+	    return parent.elementAt(start);
+	}
 
-        @Override
-        public OtpErlangObject getNthTail(final int n) {
-            return parent.getNthTail(n + start);
-        }
+	@Override
+	public OtpErlangObject getNthTail(final int n) {
+	    return parent.getNthTail(n + start);
+	}
 
-        @Override
-        public String toString() {
-            return parent.toString(start);
-        }
+	@Override
+	public String toString() {
+	    return parent.toString(start);
+	}
 
-        @Override
-        public void encode(final OtpOutputStream stream) {
-            parent.encode(stream, start);
-        }
+	@Override
+	public void encode(final OtpOutputStream stream) {
+	    parent.encode(stream, start);
+	}
 
-        @Override
-        public OtpErlangObject getLastTail() {
-            return parent.getLastTail();
-        }
+	@Override
+	public OtpErlangObject getLastTail() {
+	    return parent.getLastTail();
+	}
 
-        @Override
-        public Iterator<OtpErlangObject> iterator() {
-            return parent.iterator(start);
-        }
+	@Override
+	public Iterator<OtpErlangObject> iterator() {
+	    return parent.iterator(start);
+	}
     }
 
     private class Itr implements Iterator<OtpErlangObject> {
-        /**
-         * Index of element to be returned by subsequent call to next.
-         */
-        private int cursor;
+	/**
+	 * Index of element to be returned by subsequent call to next.
+	 */
+	private int cursor;
 
-        private Itr(final int cursor) {
-            this.cursor = cursor;
-        }
+	private Itr(final int cursor) {
+	    this.cursor = cursor;
+	}
 
-        @Override
-        public boolean hasNext() {
-            return cursor < elems.length;
-        }
+	public boolean hasNext() {
+	    return cursor < elems.length;
+	}
 
-        @Override
-        public OtpErlangObject next() {
-            try {
-                return elems[cursor++];
-            } catch (final IndexOutOfBoundsException e) {
-                throw new NoSuchElementException();
-            }
-        }
+	public OtpErlangObject next() {
+	    try {
+		return elems[cursor++];
+	    } catch (final IndexOutOfBoundsException e) {
+		throw new NoSuchElementException();
+	    }
+	}
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException(
-                    "OtpErlangList cannot be modified!");
-        }
+	public void remove() {
+	    throw new UnsupportedOperationException(
+		    "OtpErlangList cannot be modified!");
+	}
     }
 }

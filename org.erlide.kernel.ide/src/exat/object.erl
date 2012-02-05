@@ -31,7 +31,7 @@ start()->start_link().
 %% @doc Create a new object, will call the object constructor, the parameters must be a @type List 
 %%
 new(Class,P) ->
-%% 	io:format("[~w:~w]Parameter is:~w~n", [?MODULE,?LINE,P]),
+	io:format("[~w:~w]Class is ~w, Parameter is:~w~n", [?MODULE,?LINE,Class,P]),
     PropertyServerPid = spawn(object, property_server, [dict:new()]),
     server_call(PropertyServerPid,
                 {self(), set, ?PROPERTY_STATUS, ?INIT_STATUS}),
@@ -76,6 +76,11 @@ new(Class,P) ->
 	
 new(Class) ->
     new(Class,[]).
+
+create(Class,P) -> 
+	Object = new(Class,P),
+	start(Object),
+	get(Object,name).
 
 delete(Name) when is_atom(Name) ->
 	Object = get_by_name(Name),
@@ -652,7 +657,6 @@ property_server(Dict) ->
 %%
 get_all() ->
 	[X||{object,X,_,_} <- 
-%% 			get_by_attr(pid,'_')].
 			eresye:query_kb(object_store, {object,'_',pid,'_'})].
 
 %%
@@ -679,6 +683,8 @@ get_by_attr(Name,[Value|T],Acc) ->
 	get_by_attr(Name,T,[(get_by_attr(Name,Value,Acc))|Acc]);
 get_by_attr(Name,[],Acc) -> Acc.
 
+jget_by_attr(Name,Value) ->
+	[get(X,name)||X<-get_by_attr(Name,Value)].
 %%
 %% get objects by Class type, e.g. ClassName = ping_agent
 %% return a list of objects
@@ -700,31 +706,34 @@ get_by_executor(Pid) ->
 %% get objects by state, e.g. StateName = waiting or a list of states [waiting,running,start]
 %% return a list of objects
 %%
-get_by_state(Name) ->
-	get_by_attr(state,Name).
+get_by_state(Value) ->
+	get_by_attr(state,Value).
+
+jget_by_state(Value) ->
+	[get(X,name)||X<-get_by_attr(state,Value)].
   
 %%
 %% get objects by name, e.g. Name = ping1, the name is unique for each object
 %% return a list of objects if Name is a list, or an object if Name is atom
 %%  
-get_by_name(Name) when is_atom(Name)->
-	Obj = [X||{object,X,name,Name} <- eresye:query_kb(object_store, {object,'_',name,Name})],
+get_by_name(Value) when is_atom(Value)->
+	Obj = [X||{object,X,name,Value} <- eresye:query_kb(object_store, {object,'_',name,Value})],
 	if length(Obj) == 1 -> [H|_] = Obj, H;
 	   true -> Obj
 	end;
-get_by_name(Name) when is_list(Name) ->
-	get_by_name(Name,[]).
+get_by_name(Value) when is_list(Value) ->
+	get_by_nameValue.
 
-get_by_name([Name|T],Acc) -> 
-	get_by_name(T,[get_by_name(Name,Acc)|Acc]);
+get_by_name([Value|T],Acc) -> 
+	get_by_name(T,[get_by_name(Value,Acc)|Acc]);
 get_by_name([],Acc) -> Acc.
 
 %%
 %% check if the name is available
 %% return true or false
 %%
-check_name(Name) ->
-	case get_by_name(Name) of
+check_name(Value) ->
+	case get_by_name(Value) of
 		[] -> available;
 		_ -> not_available
 	end.

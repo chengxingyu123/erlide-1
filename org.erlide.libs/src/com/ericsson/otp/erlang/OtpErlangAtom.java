@@ -26,7 +26,7 @@ import java.io.Serializable;
  * characters.
  */
 public class OtpErlangAtom extends OtpErlangObject implements Serializable,
-        Cloneable {
+	Cloneable {
     // don't change this!
     static final long serialVersionUID = -3204386396807876641L;
 
@@ -39,22 +39,23 @@ public class OtpErlangAtom extends OtpErlangObject implements Serializable,
      * Create an atom from the given string.
      * 
      * @param atom
-     *            the string to create the atom from.
+     *                the string to create the atom from.
      * 
      * @exception java.lang.IllegalArgumentException
-     *                if the string is null or contains more than
-     *                {@link #maxAtomLength maxAtomLength} characters.
+     *                    if the string is null or contains more than
+     *                    {@link #maxAtomLength maxAtomLength} characters.
      */
     public OtpErlangAtom(final String atom) {
-        if (atom == null) {
-            throw new java.lang.IllegalArgumentException("null string value");
-        }
+	if (atom == null) {
+	    throw new java.lang.IllegalArgumentException(
+		    "null string value");
+	}
 
-        if (atom.length() > maxAtomLength) {
-            throw new java.lang.IllegalArgumentException("Atom may not exceed "
-                    + maxAtomLength + " characters: " + atom);
-        }
-        this.atom = atom;
+	if (atom.length() > maxAtomLength) {
+	    throw new java.lang.IllegalArgumentException("Atom may not exceed "
+		    + maxAtomLength + " characters");
+	}
+	this.atom = atom;
     }
 
     /**
@@ -62,22 +63,22 @@ public class OtpErlangAtom extends OtpErlangObject implements Serializable,
      * external format.
      * 
      * @param buf
-     *            the stream containing the encoded atom.
+     *                the stream containing the encoded atom.
      * 
      * @exception OtpErlangDecodeException
-     *                if the buffer does not contain a valid external
-     *                representation of an Erlang atom.
+     *                    if the buffer does not contain a valid external
+     *                    representation of an Erlang atom.
      */
     public OtpErlangAtom(final OtpInputStream buf)
-            throws OtpErlangDecodeException {
-        atom = buf.read_atom();
+	    throws OtpErlangDecodeException {
+	atom = buf.read_atom();
     }
 
     /**
      * Create an atom whose value is "true" or "false".
      */
     public OtpErlangAtom(final boolean t) {
-        atom = String.valueOf(t);
+	atom = String.valueOf(t);
     }
 
     /**
@@ -89,7 +90,8 @@ public class OtpErlangAtom extends OtpErlangObject implements Serializable,
      * @see #toString
      */
     public String atomValue() {
-        return atom;
+//    	System.out.println("atomValue: " + atom);
+    	return atom;
     }
 
     /**
@@ -101,7 +103,7 @@ public class OtpErlangAtom extends OtpErlangObject implements Serializable,
      * 
      */
     public boolean booleanValue() {
-        return Boolean.valueOf(atomValue()).booleanValue();
+	return Boolean.valueOf(atomValue()).booleanValue();
     }
 
     /**
@@ -116,85 +118,86 @@ public class OtpErlangAtom extends OtpErlangObject implements Serializable,
      */
     @Override
     public String toString() {
-        if (atomNeedsQuoting(atom)) {
-            return "'" + escapeSpecialChars(atom) + "'";
-        } else {
-            return atom;
-        }
+	if (atomNeedsQuoting(atom)) {
+	    return "'" + escapeSpecialChars(atom) + "'";
+	} else {
+	    return atom;
+	}
     }
 
     /**
      * Determine if two atoms are equal.
      * 
      * @param o
-     *            the other object to compare to.
+     *                the other object to compare to.
      * 
      * @return true if the atoms are equal, false otherwise.
      */
     @Override
     public boolean equals(final Object o) {
 
-        if (!(o instanceof OtpErlangAtom)) {
-            return false;
-        }
+	if (!(o instanceof OtpErlangAtom)) {
+	    return false;
+	}
 
-        final OtpErlangAtom atom = (OtpErlangAtom) o;
-        return this.atom.compareTo(atom.atom) == 0;
+	final OtpErlangAtom atom = (OtpErlangAtom) o;
+	return this.atom.compareTo(atom.atom) == 0;
     }
-
+    
     @Override
     protected int doHashCode() {
-        return atom.hashCode();
+	return atom.hashCode();
     }
 
     /**
      * Convert this atom to the equivalent Erlang external representation.
      * 
      * @param buf
-     *            an output stream to which the encoded atom should be written.
+     *                an output stream to which the encoded atom should be
+     *                written.
      */
     @Override
     public void encode(final OtpOutputStream buf) {
-        buf.write_atom(atom);
+	buf.write_atom(atom);
     }
 
     /* the following four predicates are helpers for the toString() method */
     private boolean isErlangDigit(final char c) {
-        return c >= '0' && c <= '9';
+	return c >= '0' && c <= '9';
     }
 
     private boolean isErlangUpper(final char c) {
-        return c >= 'A' && c <= 'Z' || c == '_';
+	return c >= 'A' && c <= 'Z' || c == '_';
     }
 
     private boolean isErlangLower(final char c) {
-        return c >= 'a' && c <= 'z';
+	return c >= 'a' && c <= 'z';
     }
 
     private boolean isErlangLetter(final char c) {
-        return isErlangLower(c) || isErlangUpper(c);
+	return isErlangLower(c) || isErlangUpper(c);
     }
 
     // true if the atom should be displayed with quotation marks
     private boolean atomNeedsQuoting(final String s) {
-        char c;
+	char c;
 
-        if (s.length() == 0) {
-            return true;
-        }
-        if (!isErlangLower(s.charAt(0))) {
-            return true;
-        }
+	if (s.length() == 0) {
+	    return true;
+	}
+	if (!isErlangLower(s.charAt(0))) {
+	    return true;
+	}
 
-        final int len = s.length();
-        for (int i = 1; i < len; i++) {
-            c = s.charAt(i);
+	final int len = s.length();
+	for (int i = 1; i < len; i++) {
+	    c = s.charAt(i);
 
-            if (!isErlangLetter(c) && !isErlangDigit(c) && c != '@') {
-                return true;
-            }
-        }
-        return false;
+	    if (!isErlangLetter(c) && !isErlangDigit(c) && c != '@') {
+		return true;
+	    }
+	}
+	return false;
     }
 
     /*
@@ -203,80 +206,80 @@ public class OtpErlangAtom extends OtpErlangObject implements Serializable,
      * printable.
      */
     private String escapeSpecialChars(final String s) {
-        char c;
-        final StringBuffer so = new StringBuffer();
+	char c;
+	final StringBuffer so = new StringBuffer();
 
-        final int len = s.length();
-        for (int i = 0; i < len; i++) {
-            c = s.charAt(i);
+	final int len = s.length();
+	for (int i = 0; i < len; i++) {
+	    c = s.charAt(i);
 
-            /*
-             * note that some of these escape sequences are unique to Erlang,
-             * which is why the corresponding 'case' values use octal. The
-             * resulting string is, of course, in Erlang format.
-             */
+	    /*
+	     * note that some of these escape sequences are unique to Erlang,
+	     * which is why the corresponding 'case' values use octal. The
+	     * resulting string is, of course, in Erlang format.
+	     */
 
-            switch (c) {
-            // some special escape sequences
-            case '\b':
-                so.append("\\b");
-                break;
+	    switch (c) {
+	    // some special escape sequences
+	    case '\b':
+		so.append("\\b");
+		break;
 
-            case 0177:
-                so.append("\\d");
-                break;
+	    case 0177:
+		so.append("\\d");
+		break;
 
-            case 033:
-                so.append("\\e");
-                break;
+	    case 033:
+		so.append("\\e");
+		break;
 
-            case '\f':
-                so.append("\\f");
-                break;
+	    case '\f':
+		so.append("\\f");
+		break;
 
-            case '\n':
-                so.append("\\n");
-                break;
+	    case '\n':
+		so.append("\\n");
+		break;
 
-            case '\r':
-                so.append("\\r");
-                break;
+	    case '\r':
+		so.append("\\r");
+		break;
 
-            case '\t':
-                so.append("\\t");
-                break;
+	    case '\t':
+		so.append("\\t");
+		break;
 
-            case 013:
-                so.append("\\v");
-                break;
+	    case 013:
+		so.append("\\v");
+		break;
 
-            case '\\':
-                so.append("\\\\");
-                break;
+	    case '\\':
+		so.append("\\\\");
+		break;
 
-            case '\'':
-                so.append("\\'");
-                break;
+	    case '\'':
+		so.append("\\'");
+		break;
 
-            case '\"':
-                so.append("\\\"");
-                break;
+	    case '\"':
+		so.append("\\\"");
+		break;
 
-            default:
-                // some other character classes
-                if (c < 027) {
-                    // control chars show as "\^@", "\^A" etc
-                    so.append("\\^" + (char) ('A' - 1 + c));
-                } else if (c > 126) {
-                    // 8-bit chars show as \345 \344 \366 etc
-                    so.append("\\" + Integer.toOctalString(c));
-                } else {
-                    // character is printable without modification!
-                    so.append(c);
-                }
-            }
-        }
-        return new String(so);
+	    default:
+		// some other character classes
+		if (c < 027) {
+		    // control chars show as "\^@", "\^A" etc
+		    so.append("\\^" + (char) ('A' - 1 + c));
+		} else if (c > 126) {
+		    // 8-bit chars show as \345 \344 \366 etc
+		    so.append("\\" + Integer.toOctalString(c));
+		} else {
+		    // character is printable without modification!
+		    so.append(c);
+		}
+	    }
+	}
+	return new String(so);
     }
 
 }

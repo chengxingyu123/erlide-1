@@ -24,7 +24,7 @@ import java.io.Serializable;
  * Provides a Java representation of Erlang ports.
  */
 public class OtpErlangPort extends OtpErlangObject implements Serializable,
-        Cloneable {
+	Cloneable {
     // don't change this!
     static final long serialVersionUID = 4037115468007644704L;
 
@@ -41,11 +41,11 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      * @deprecated use OtpLocalNode:createPort() instead
      */
     private OtpErlangPort(final OtpSelf self) {
-        final OtpErlangPort p = self.createPort();
+	final OtpErlangPort p = self.createPort();
 
-        id = p.id;
-        creation = p.creation;
-        node = p.node;
+	id = p.id;
+	creation = p.creation;
+	node = p.node;
     }
 
     /**
@@ -53,38 +53,39 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      * external format.
      * 
      * @param buf
-     *            the stream containing the encoded port.
+     *                the stream containing the encoded port.
      * 
      * @exception OtpErlangDecodeException
-     *                if the buffer does not contain a valid external
-     *                representation of an Erlang port.
+     *                    if the buffer does not contain a valid external
+     *                    representation of an Erlang port.
      */
     public OtpErlangPort(final OtpInputStream buf)
-            throws OtpErlangDecodeException {
-        final OtpErlangPort p = buf.read_port();
+	    throws OtpErlangDecodeException {
+	final OtpErlangPort p = buf.read_port();
 
-        node = p.node();
-        id = p.id();
-        creation = p.creation();
+	node = p.node();
+	id = p.id();
+	creation = p.creation();
     }
 
     /**
      * Create an Erlang port from its components.
      * 
      * @param node
-     *            the nodename.
+     *                the nodename.
      * 
      * @param id
-     *            an arbitrary number. Only the low order 28 bits will be used.
+     *                an arbitrary number. Only the low order 28 bits will be
+     *                used.
      * 
      * @param creation
-     *            another arbitrary number. Only the low order 2 bits will be
-     *            used.
+     *                another arbitrary number. Only the low order 2 bits will
+     *                be used.
      */
     public OtpErlangPort(final String node, final int id, final int creation) {
-        this.node = node;
-        this.id = id & 0xfffffff; // 28 bits
-        this.creation = creation & 0x03; // 2 bits
+	this.node = node;
+	this.id = id & 0xfffffff; // 28 bits
+	this.creation = creation & 0x03; // 2 bits
     }
 
     /**
@@ -93,7 +94,7 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      * @return the id number from the port.
      */
     public int id() {
-        return id;
+	return id;
     }
 
     /**
@@ -102,7 +103,7 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      * @return the creation number from the port.
      */
     public int creation() {
-        return creation;
+	return creation;
     }
 
     /**
@@ -111,7 +112,7 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      * @return the node name from the port.
      */
     public String node() {
-        return node;
+	return node;
     }
 
     /**
@@ -122,18 +123,19 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      */
     @Override
     public String toString() {
-        return "#Port<" + node + "." + id + ">";
+	return "#Port<" + node + "." + id + ">";
     }
 
     /**
      * Convert this port to the equivalent Erlang external representation.
      * 
      * @param buf
-     *            an output stream to which the encoded port should be written.
+     *                an output stream to which the encoded port should be
+     *                written.
      */
     @Override
     public void encode(final OtpOutputStream buf) {
-        buf.write_port(node, id, creation);
+	buf.write_port(node, id, creation);
     }
 
     /**
@@ -141,27 +143,27 @@ public class OtpErlangPort extends OtpErlangObject implements Serializable,
      * equal.
      * 
      * @param o
-     *            the other port to compare to.
+     *                the other port to compare to.
      * 
      * @return true if the ports are equal, false otherwise.
      */
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof OtpErlangPort)) {
-            return false;
-        }
+	if (!(o instanceof OtpErlangPort)) {
+	    return false;
+	}
 
-        final OtpErlangPort port = (OtpErlangPort) o;
+	final OtpErlangPort port = (OtpErlangPort) o;
 
-        return creation == port.creation && id == port.id
-                && node.compareTo(port.node) == 0;
+	return creation == port.creation && id == port.id
+		&& node.compareTo(port.node) == 0;
     }
-
+    
     @Override
     protected int doHashCode() {
-        final OtpErlangObject.Hash hash = new OtpErlangObject.Hash(6);
-        hash.combine(creation);
-        hash.combine(id, node.hashCode());
-        return hash.valueOf();
+	OtpErlangObject.Hash hash = new OtpErlangObject.Hash(6);
+	hash.combine(creation);
+	hash.combine(id, node.hashCode());
+	return hash.valueOf();
     }
 }

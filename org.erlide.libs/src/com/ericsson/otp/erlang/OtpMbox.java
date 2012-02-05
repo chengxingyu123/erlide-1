@@ -18,6 +18,8 @@
  */
 package com.ericsson.otp.erlang;
 
+import java.io.IOException;
+
 /**
  * <p>
  * Provides a simple mechanism for exchanging messages with Erlang processes or
@@ -86,17 +88,17 @@ public class OtpMbox {
     // package constructor: called by OtpNode:createMbox(name)
     // to create a named mbox
     OtpMbox(final OtpNode home, final OtpErlangPid self, final String name) {
-        this.self = self;
-        this.home = home;
-        this.name = name;
-        queue = new GenericQueue();
-        links = new Links(10);
+	this.self = self;
+	this.home = home;
+	this.name = name;
+	queue = new GenericQueue();
+	links = new Links(10);
     }
 
     // package constructor: called by OtpNode:createMbox()
     // to create an anonymous
     OtpMbox(final OtpNode home, final OtpErlangPid self) {
-        this(home, self, null);
+	this(home, self, null);
     }
 
     /**
@@ -115,7 +117,7 @@ public class OtpMbox {
      * @return the self pid for this mailbox.
      */
     public OtpErlangPid self() {
-        return self;
+	return self;
     }
 
     /**
@@ -128,13 +130,13 @@ public class OtpMbox {
      * </p>
      * 
      * @param name
-     *            the name to register for the mailbox. Specify null to
-     *            unregister the existing name from this mailbox.
+     *                the name to register for the mailbox. Specify null to
+     *                unregister the existing name from this mailbox.
      * 
      * @return true if the name was available, or false otherwise.
      */
     public synchronized boolean registerName(final String name) {
-        return home.registerName(name, this);
+	return home.registerName(name, this);
     }
 
     /**
@@ -144,7 +146,7 @@ public class OtpMbox {
      *         no registerd name.
      */
     public String getName() {
-        return name;
+	return name;
     }
 
     /**
@@ -154,54 +156,54 @@ public class OtpMbox {
      *         of the next message waiting in this mailbox.
      * 
      * @exception OtpErlangDecodeException
-     *                if the message can not be decoded.
+     *                    if the message can not be decoded.
      * 
      * @exception OtpErlangExit
-     *                if a linked {@link OtpErlangPid pid} has exited or has
-     *                sent an exit signal to this mailbox.
+     *                    if a linked {@link OtpErlangPid pid} has exited or has
+     *                    sent an exit signal to this mailbox.
      */
     public OtpErlangObject receive() throws OtpErlangExit,
-            OtpErlangDecodeException {
-        try {
-            return receiveMsg().getMsg();
-        } catch (final OtpErlangExit e) {
-            throw e;
-        } catch (final OtpErlangDecodeException f) {
-            throw f;
-        }
+	    OtpErlangDecodeException {
+	try {
+	    return receiveMsg().getMsg();
+	} catch (final OtpErlangExit e) {
+	    throw e;
+	} catch (final OtpErlangDecodeException f) {
+	    throw f;
+	}
     }
 
     /**
      * Wait for a message to arrive for this mailbox.
      * 
      * @param timeout
-     *            the time, in milliseconds, to wait for a message before
-     *            returning null.
+     *                the time, in milliseconds, to wait for a message before
+     *                returning null.
      * 
      * @return an {@link OtpErlangObject OtpErlangObject} representing the body
      *         of the next message waiting in this mailbox.
      * 
      * @exception OtpErlangDecodeException
-     *                if the message can not be decoded.
+     *                    if the message can not be decoded.
      * 
      * @exception OtpErlangExit
-     *                if a linked {@link OtpErlangPid pid} has exited or has
-     *                sent an exit signal to this mailbox.
+     *                    if a linked {@link OtpErlangPid pid} has exited or has
+     *                    sent an exit signal to this mailbox.
      */
     public OtpErlangObject receive(final long timeout) throws OtpErlangExit,
-            OtpErlangDecodeException {
-        try {
-            final OtpMsg m = receiveMsg(timeout);
-            if (m != null) {
-                return m.getMsg();
-            }
-        } catch (final OtpErlangExit e) {
-            throw e;
-        } catch (final OtpErlangDecodeException f) {
-            throw f;
-        } catch (final InterruptedException g) {
-        }
-        return null;
+	    OtpErlangDecodeException {
+	try {
+	    final OtpMsg m = receiveMsg(timeout);
+	    if (m != null) {
+		return m.getMsg();
+	    }
+	} catch (final OtpErlangExit e) {
+	    throw e;
+	} catch (final OtpErlangDecodeException f) {
+	    throw f;
+	} catch (final InterruptedException g) {
+	}
+	return null;
     }
 
     /**
@@ -211,40 +213,40 @@ public class OtpMbox {
      *         message waiting in this mailbox.
      * 
      * @exception OtpErlangExit
-     *                if a linked {@link OtpErlangPid pid} has exited or has
-     *                sent an exit signal to this mailbox.
+     *                    if a linked {@link OtpErlangPid pid} has exited or has
+     *                    sent an exit signal to this mailbox.
      * 
      */
     public OtpInputStream receiveBuf() throws OtpErlangExit {
-        return receiveMsg().getMsgBuf();
+	return receiveMsg().getMsgBuf();
     }
 
     /**
      * Wait for a message to arrive for this mailbox.
      * 
      * @param timeout
-     *            the time, in milliseconds, to wait for a message before
-     *            returning null.
+     *                the time, in milliseconds, to wait for a message before
+     *                returning null.
      * 
      * @return a byte array representing the still-encoded body of the next
      *         message waiting in this mailbox.
      * 
      * @exception OtpErlangExit
-     *                if a linked {@link OtpErlangPid pid} has exited or has
-     *                sent an exit signal to this mailbox.
+     *                    if a linked {@link OtpErlangPid pid} has exited or has
+     *                    sent an exit signal to this mailbox.
      * 
      * @exception InterruptedException
-     *                if no message if the method times out before a message
-     *                becomes available.
+     *                    if no message if the method times out before a message
+     *                    becomes available.
      */
     public OtpInputStream receiveBuf(final long timeout)
-            throws InterruptedException, OtpErlangExit {
-        final OtpMsg m = receiveMsg(timeout);
-        if (m != null) {
-            return m.getMsgBuf();
-        }
+	    throws InterruptedException, OtpErlangExit {
+	final OtpMsg m = receiveMsg(timeout);
+	if (m != null) {
+	    return m.getMsgBuf();
+	}
 
-        return null;
+	return null;
     }
 
     /**
@@ -254,67 +256,112 @@ public class OtpMbox {
      *         well as the body of the next message waiting in this mailbox.
      * 
      * @exception OtpErlangExit
-     *                if a linked {@link OtpErlangPid pid} has exited or has
-     *                sent an exit signal to this mailbox.
+     *                    if a linked {@link OtpErlangPid pid} has exited or has
+     *                    sent an exit signal to this mailbox.
      * 
      */
     public OtpMsg receiveMsg() throws OtpErlangExit {
 
-        final OtpMsg m = (OtpMsg) queue.get();
+	final OtpMsg m = (OtpMsg) queue.get();
 
-        switch (m.type()) {
-        case OtpMsg.exitTag:
-        case OtpMsg.exit2Tag:
-            try {
-                final OtpErlangObject o = m.getMsg();
-                throw new OtpErlangExit(o, m.getSenderPid());
-            } catch (final OtpErlangDecodeException e) {
-                throw new OtpErlangExit("unknown", m.getSenderPid());
-            }
+	switch (m.type()) {
+	case OtpMsg.exitTag:
+	case OtpMsg.exit2Tag:
+	    try {
+		final OtpErlangObject o = m.getMsg();
+		throw new OtpErlangExit(o, m.getSenderPid());
+	    } catch (final OtpErlangDecodeException e) {
+		throw new OtpErlangExit("unknown", m.getSenderPid());
+	    }
 
-        default:
-            return m;
-        }
+	default:
+	    return m;
+	}
     }
 
     /**
      * Wait for a message to arrive for this mailbox.
      * 
      * @param timeout
-     *            the time, in milliseconds, to wait for a message.
+     *                the time, in milliseconds, to wait for a message.
      * 
      * @return an {@link OtpMsg OtpMsg} containing the header information as
      *         well as the body of the next message waiting in this mailbox.
      * 
      * @exception OtpErlangExit
-     *                if a linked {@link OtpErlangPid pid} has exited or has
-     *                sent an exit signal to this mailbox.
+     *                    if a linked {@link OtpErlangPid pid} has exited or has
+     *                    sent an exit signal to this mailbox.
      * 
      * @exception InterruptedException
-     *                if no message if the method times out before a message
-     *                becomes available.
+     *                    if no message if the method times out before a message
+     *                    becomes available.
      */
     public OtpMsg receiveMsg(final long timeout) throws InterruptedException,
-            OtpErlangExit {
-        final OtpMsg m = (OtpMsg) queue.get(timeout);
+	    OtpErlangExit {
+	final OtpMsg m = (OtpMsg) queue.get(timeout);
 
-        if (m == null) {
-            return null;
-        }
+	if (m == null) {
+	    return null;
+	}
 
-        switch (m.type()) {
-        case OtpMsg.exitTag:
-        case OtpMsg.exit2Tag:
-            try {
-                final OtpErlangObject o = m.getMsg();
-                throw new OtpErlangExit(o, m.getSenderPid());
-            } catch (final OtpErlangDecodeException e) {
-                throw new OtpErlangExit("unknown", m.getSenderPid());
-            }
+	switch (m.type()) {
+	case OtpMsg.exitTag:
+	case OtpMsg.exit2Tag:
+	    try {
+		final OtpErlangObject o = m.getMsg();
+		throw new OtpErlangExit(o, m.getSenderPid());
+	    } catch (final OtpErlangDecodeException e) {
+		throw new OtpErlangExit("unknown", m.getSenderPid());
+	    }
 
-        default:
-            return m;
-        }
+	default:
+	    return m;
+	}
+    }
+    
+    /**
+     * Send an RPC request to the remote Erlang node. This convenience function
+     * creates the following message and sends it to 'rex' on the remote node:
+     * 
+     * <pre>
+     * { self, { call, Mod, Fun, Args, user } }
+     * </pre>
+     * 
+     * <p>
+     * Note that this method has unpredicatble results if the remote node is not
+     * an Erlang node.
+     * </p>
+     * 
+     * @param mod
+     *                the name of the Erlang module containing the function to
+     *                be called.
+     * @param fun
+     *                the name of the function to call.
+     * @param args
+     *                a list of Erlang terms, to be used as arguments to the
+     *                function.
+     * 
+     * @exception java.io.IOException
+     *                    if the connection is not active or a communication
+     *                    error occurs.
+     */
+    public void sendRPC(final String mod, final String fun,
+	    final OtpErlangList args) throws IOException {
+		final OtpErlangObject[] rpc = new OtpErlangObject[2];
+		final OtpErlangObject[] call = new OtpErlangObject[5];
+	
+		/* {self, { call, Mod, Fun, Args, user}} */
+	
+		call[0] = new OtpErlangAtom("call");
+		call[1] = new OtpErlangAtom(mod);
+		call[2] = new OtpErlangAtom(fun);
+		call[3] = args;
+		call[4] = new OtpErlangAtom("user");
+	
+		rpc[0] = self;
+		rpc[1] = new OtpErlangTuple(call);
+	
+		send("rex", new OtpErlangTuple(rpc));
     }
 
     /**
@@ -322,27 +369,27 @@ public class OtpMbox {
      * another {@link OtpMbox mailbox} or an Erlang process.
      * 
      * @param to
-     *            the {@link OtpErlangPid pid} identifying the intended
-     *            recipient of the message.
+     *                the {@link OtpErlangPid pid} identifying the intended
+     *                recipient of the message.
      * 
      * @param msg
-     *            the body of the message to send.
+     *                the body of the message to send.
      * 
      */
     public void send(final OtpErlangPid to, final OtpErlangObject msg) {
-        try {
-            final String node = to.node();
-            if (node.equals(home.node())) {
-                home.deliver(new OtpMsg(to, (OtpErlangObject) msg.clone()));
-            } else {
-                final OtpCookedConnection conn = home.getConnection(node);
-                if (conn == null) {
-                    return;
-                }
-                conn.send(self, to, msg);
-            }
-        } catch (final Exception e) {
-        }
+	try {
+	    final String node = to.node();
+	    if (node.equals(home.node())) {
+		home.deliver(new OtpMsg(to, (OtpErlangObject) msg.clone()));
+	    } else {
+		final OtpCookedConnection conn = home.getConnection(node);
+		if (conn == null) {
+		    return;
+		}
+		conn.send(self, to, msg);
+	    }
+	} catch (final Exception e) {
+	}
     }
 
     /**
@@ -350,50 +397,50 @@ public class OtpMbox {
      * mailbox.
      * 
      * @param name
-     *            the registered name of recipient mailbox.
+     *                the registered name of recipient mailbox.
      * 
      * @param msg
-     *            the body of the message to send.
+     *                the body of the message to send.
      * 
      */
     public void send(final String name, final OtpErlangObject msg) {
-        home.deliver(new OtpMsg(self, name, (OtpErlangObject) msg.clone()));
+	home.deliver(new OtpMsg(self, name, (OtpErlangObject) msg.clone()));
     }
 
     /**
      * Send a message to a named mailbox created from another node.
      * 
      * @param name
-     *            the registered name of recipient mailbox.
+     *                the registered name of recipient mailbox.
      * 
      * @param node
-     *            the name of the remote node where the recipient mailbox is
-     *            registered.
+     *                the name of the remote node where the recipient mailbox is
+     *                registered.
      * 
      * @param msg
-     *            the body of the message to send.
+     *                the body of the message to send.
      * 
      */
     public void send(final String name, final String node,
-            final OtpErlangObject msg) {
-        try {
-            final String currentNode = home.node();
-            if (node.equals(currentNode)) {
-                send(name, msg);
-            } else if (node.indexOf('@', 0) < 0
-                    && node.equals(currentNode.substring(0,
-                            currentNode.indexOf('@', 0)))) {
-                send(name, msg);
-            } else {
-                // other node
-                final OtpCookedConnection conn = home.getConnection(node);
-                if (conn == null) {
-                    return;
-                }
-                conn.send(self, name, msg);
-            }
-        } catch (final Exception e) {
-        }
+	    final OtpErlangObject msg) {
+	try {
+	    final String currentNode = home.node();
+	    if (node.equals(currentNode)) {
+		send(name, msg);
+	    } else if (node.indexOf('@', 0) < 0
+		    && node.equals(currentNode.substring(0, currentNode
+			    .indexOf('@', 0)))) {
+		send(name, msg);
+	    } else {
+		// other node
+		final OtpCookedConnection conn = home.getConnection(node);
+		if (conn == null) {
+		    return;
+		}
+		conn.send(self, name, msg);
+	    }
+	} catch (final Exception e) {
+	}
     }
 
     /**
@@ -412,19 +459,20 @@ public class OtpMbox {
      * </p>
      * 
      * @param reason
-     *            an Erlang term describing the reason for the exit.
+     *                an Erlang term describing the reason for the exit.
      */
     public void exit(final OtpErlangObject reason) {
-        home.closeMbox(this, reason);
+	home.closeMbox(this, reason);
     }
 
     /**
-     * Equivalent to <code>exit(new OtpErlangAtom(reason))</code>. </p>
+     * Equivalent to <code>exit(new OtpErlangAtom(reason))</code>.
+     * </p>
      * 
      * @see #exit(OtpErlangObject)
      */
     public void exit(final String reason) {
-        exit(new OtpErlangAtom(reason));
+	exit(new OtpErlangAtom(reason));
     }
 
     /**
@@ -435,15 +483,15 @@ public class OtpMbox {
      * </p>
      * 
      * @param to
-     *            the {@link OtpErlangPid pid} to which the exit signal should
-     *            be sent.
+     *                the {@link OtpErlangPid pid} to which the exit signal
+     *                should be sent.
      * 
      * @param reason
-     *            an Erlang term indicating the reason for the exit.
+     *                an Erlang term indicating the reason for the exit.
      */
     // it's called exit, but it sends exit2
     public void exit(final OtpErlangPid to, final OtpErlangObject reason) {
-        exit(2, to, reason);
+	exit(2, to, reason);
     }
 
     /**
@@ -455,34 +503,34 @@ public class OtpMbox {
      * @see #exit(OtpErlangPid, OtpErlangObject)
      */
     public void exit(final OtpErlangPid to, final String reason) {
-        exit(to, new OtpErlangAtom(reason));
+	exit(to, new OtpErlangAtom(reason));
     }
 
     // this function used internally when "process" dies
     // since Erlang discerns between exit and exit/2.
     private void exit(final int arity, final OtpErlangPid to,
-            final OtpErlangObject reason) {
-        try {
-            final String node = to.node();
-            if (node.equals(home.node())) {
-                home.deliver(new OtpMsg(OtpMsg.exitTag, self, to, reason));
-            } else {
-                final OtpCookedConnection conn = home.getConnection(node);
-                if (conn == null) {
-                    return;
-                }
-                switch (arity) {
-                case 1:
-                    conn.exit(self, to, reason);
-                    break;
+	    final OtpErlangObject reason) {
+	try {
+	    final String node = to.node();
+	    if (node.equals(home.node())) {
+		home.deliver(new OtpMsg(OtpMsg.exitTag, self, to, reason));
+	    } else {
+		final OtpCookedConnection conn = home.getConnection(node);
+		if (conn == null) {
+		    return;
+		}
+		switch (arity) {
+		case 1:
+		    conn.exit(self, to, reason);
+		    break;
 
-                case 2:
-                    conn.exit2(self, to, reason);
-                    break;
-                }
-            }
-        } catch (final Exception e) {
-        }
+		case 2:
+		    conn.exit2(self, to, reason);
+		    break;
+		}
+	    }
+	} catch (final Exception e) {
+	}
     }
 
     /**
@@ -506,35 +554,35 @@ public class OtpMbox {
      * </p>
      * 
      * @param to
-     *            the {@link OtpErlangPid pid} representing the object to link
-     *            to.
+     *                the {@link OtpErlangPid pid} representing the object to
+     *                link to.
      * 
      * @exception OtpErlangExit
-     *                if the {@link OtpErlangPid pid} referred to does not exist
-     *                or could not be reached.
+     *                    if the {@link OtpErlangPid pid} referred to does not
+     *                    exist or could not be reached.
      * 
      */
     public void link(final OtpErlangPid to) throws OtpErlangExit {
-        try {
-            final String node = to.node();
-            if (node.equals(home.node())) {
-                if (!home.deliver(new OtpMsg(OtpMsg.linkTag, self, to))) {
-                    throw new OtpErlangExit("noproc", to);
-                }
-            } else {
-                final OtpCookedConnection conn = home.getConnection(node);
-                if (conn != null) {
-                    conn.link(self, to);
-                } else {
-                    throw new OtpErlangExit("noproc", to);
-                }
-            }
-        } catch (final OtpErlangExit e) {
-            throw e;
-        } catch (final Exception e) {
-        }
+	try {
+	    final String node = to.node();
+	    if (node.equals(home.node())) {
+		if (!home.deliver(new OtpMsg(OtpMsg.linkTag, self, to))) {
+		    throw new OtpErlangExit("noproc", to);
+		}
+	    } else {
+		final OtpCookedConnection conn = home.getConnection(node);
+		if (conn != null) {
+		    conn.link(self, to);
+		} else {
+		    throw new OtpErlangExit("noproc", to);
+		}
+	    }
+	} catch (final OtpErlangExit e) {
+	    throw e;
+	} catch (final Exception e) {
+	}
 
-        links.addLink(self, to);
+	links.addLink(self, to);
     }
 
     /**
@@ -546,25 +594,25 @@ public class OtpMbox {
      * </p>
      * 
      * @param to
-     *            the {@link OtpErlangPid pid} representing the object to unlink
-     *            from.
+     *                the {@link OtpErlangPid pid} representing the object to
+     *                unlink from.
      * 
      */
     public void unlink(final OtpErlangPid to) {
-        links.removeLink(self, to);
+	links.removeLink(self, to);
 
-        try {
-            final String node = to.node();
-            if (node.equals(home.node())) {
-                home.deliver(new OtpMsg(OtpMsg.unlinkTag, self, to));
-            } else {
-                final OtpCookedConnection conn = home.getConnection(node);
-                if (conn != null) {
-                    conn.unlink(self, to);
-                }
-            }
-        } catch (final Exception e) {
-        }
+	try {
+	    final String node = to.node();
+	    if (node.equals(home.node())) {
+		home.deliver(new OtpMsg(OtpMsg.unlinkTag, self, to));
+	    } else {
+		final OtpCookedConnection conn = home.getConnection(node);
+		if (conn != null) {
+		    conn.unlink(self, to);
+		}
+	    }
+	} catch (final Exception e) {
+	}
     }
 
     /**
@@ -589,13 +637,13 @@ public class OtpMbox {
      * </p>
      * 
      * @param node
-     *            the name of the node to ping.
+     *                the name of the node to ping.
      * 
      * @param timeout
-     *            the time, in milliseconds, before reporting failure.
+     *                the time, in milliseconds, before reporting failure.
      */
     public boolean ping(final String node, final long timeout) {
-        return home.ping(node, timeout);
+	return home.ping(node, timeout);
     }
 
     /**
@@ -613,7 +661,7 @@ public class OtpMbox {
      *         {@link OtpNode node}.
      */
     public String[] getNames() {
-        return home.getNames();
+	return home.getNames();
     }
 
     /**
@@ -629,7 +677,7 @@ public class OtpMbox {
      *         name, or null if the name is not known on this node.
      */
     public OtpErlangPid whereis(final String name) {
-        return home.whereis(name);
+	return home.whereis(name);
     }
 
     /**
@@ -652,13 +700,13 @@ public class OtpMbox {
      * </p>
      */
     public void close() {
-        home.closeMbox(this);
+	home.closeMbox(this);
     }
 
     @Override
     protected void finalize() {
-        close();
-        queue.flush();
+	close();
+	queue.flush();
     }
 
     /**
@@ -669,12 +717,12 @@ public class OtpMbox {
      */
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof OtpMbox)) {
-            return false;
-        }
+	if (!(o instanceof OtpMbox)) {
+	    return false;
+	}
 
-        final OtpMbox m = (OtpMbox) o;
-        return m.self.equals(self);
+	final OtpMbox m = (OtpMbox) o;
+	return m.self.equals(self);
     }
 
     @Override
@@ -690,37 +738,37 @@ public class OtpMbox {
      * leaves any links intact.
      */
     void deliver(final OtpMsg m) {
-        switch (m.type()) {
-        case OtpMsg.linkTag:
-            links.addLink(self, m.getSenderPid());
-            break;
+	switch (m.type()) {
+	case OtpMsg.linkTag:
+	    links.addLink(self, m.getSenderPid());
+	    break;
 
-        case OtpMsg.unlinkTag:
-            links.removeLink(self, m.getSenderPid());
-            break;
+	case OtpMsg.unlinkTag:
+	    links.removeLink(self, m.getSenderPid());
+	    break;
 
-        case OtpMsg.exitTag:
-            links.removeLink(self, m.getSenderPid());
-            queue.put(m);
-            break;
+	case OtpMsg.exitTag:
+	    links.removeLink(self, m.getSenderPid());
+	    queue.put(m);
+	    break;
 
-        case OtpMsg.exit2Tag:
-        default:
-            queue.put(m);
-            break;
-        }
+	case OtpMsg.exit2Tag:
+	default:
+	    queue.put(m);
+	    break;
+	}
     }
 
     // used to break all known links to this mbox
     void breakLinks(final OtpErlangObject reason) {
-        final Link[] l = links.clearLinks();
+	final Link[] l = links.clearLinks();
 
-        if (l != null) {
-            final int len = l.length;
+	if (l != null) {
+	    final int len = l.length;
 
-            for (int i = 0; i < len; i++) {
-                exit(1, l[i].remote(), reason);
-            }
-        }
+	    for (int i = 0; i < len; i++) {
+		exit(1, l[i].remote(), reason);
+	    }
+	}
     }
 }

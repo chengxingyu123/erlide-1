@@ -52,6 +52,7 @@ import org.erlide.ui.views.BackendContentProvider;
 import org.erlide.ui.views.BackendLabelProvider;
 import org.osgi.service.event.Event;
 
+import com.ericsson.otp.erlang.OtpConverter;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangPid;
@@ -110,10 +111,12 @@ public class ObjectListView extends ViewPart {
                 return new OtpErlangObject[] {};
             }
             final OtpErlangObject[] ss = new OtpErlangObject[r.elements().length];
+            final Object[] sss = new Object[r.elements().length];
 
             for (int i = 0; i < r.elements().length; i++) {
                 final OtpErlangTuple e = (OtpErlangTuple) r.elementAt(i);
                 ss[i] = e;
+                sss[i]=OtpConverter.OtpErlangObject2Object(e);
             }
 
             return ss;

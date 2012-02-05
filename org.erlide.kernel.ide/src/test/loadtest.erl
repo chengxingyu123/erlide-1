@@ -18,10 +18,10 @@ loadtest_(Self)->
 
 do_action(Self, _, _, _) ->
  	C = object:get(Self,counter),
-	example_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
+%%	example_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
 %% 	atomic_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
 %% 	base_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
-%% 	point:test(list_to_atom("point" ++ integer_to_list(C))),
+ 	point:test(list_to_atom("point" ++ integer_to_list(C))),
 %% 	relativepoint:test(list_to_atom("relativepoint" ++ integer_to_list(C))),
  	io:format("[~w ] step ~w\n",[Self, C]),
 	Max = object:get(Self,max),

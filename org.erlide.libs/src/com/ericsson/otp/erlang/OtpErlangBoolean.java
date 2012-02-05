@@ -25,7 +25,7 @@ import java.io.Serializable;
  * atoms with values 'true' and 'false'.
  */
 public class OtpErlangBoolean extends OtpErlangAtom implements Serializable,
-        Cloneable {
+	Cloneable {
     // don't change this!
     static final long serialVersionUID = 1087178844844988393L;
 
@@ -33,10 +33,10 @@ public class OtpErlangBoolean extends OtpErlangAtom implements Serializable,
      * Create a boolean from the given value
      * 
      * @param t
-     *            the boolean value to represent as an atom.
+     *                the boolean value to represent as an atom.
      */
     public OtpErlangBoolean(final boolean t) {
-        super(t);
+	super(t);
     }
 
     /**
@@ -46,11 +46,11 @@ public class OtpErlangBoolean extends OtpErlangAtom implements Serializable,
      * atom values, the boolean will have the value false.
      * 
      * @exception OtpErlangDecodeException
-     *                if the buffer does not contain a valid external
-     *                representation of an Erlang atom.
+     *                    if the buffer does not contain a valid external
+     *                    representation of an Erlang atom.
      */
     public OtpErlangBoolean(final OtpInputStream buf)
-            throws OtpErlangDecodeException {
-        super(buf);
+	    throws OtpErlangDecodeException {
+	super(buf);
     }
 }

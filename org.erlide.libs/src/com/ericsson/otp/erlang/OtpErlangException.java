@@ -28,13 +28,13 @@ public class OtpErlangException extends OtpException {
      * Provides no message.
      */
     public OtpErlangException() {
-        super();
+	super();
     }
 
     /**
      * Provides a detailed message.
      */
     public OtpErlangException(final String msg) {
-        super(msg);
+	super(msg);
     }
 }

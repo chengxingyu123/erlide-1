@@ -1,1 +1,1 @@
-erl -sname master -pa ebin/ -boot start_sasl  -env ERL_MAX_ETS_TABLES 1000000 +P 10000000 -s object
+erl -sname master -setcookie erlide -pa ebin/ -boot start_sasl  -env ERL_MAX_ETS_TABLES 1000000 +P 10000000 -s object

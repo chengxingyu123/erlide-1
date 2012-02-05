@@ -24,7 +24,7 @@ import java.io.Serializable;
  * Provides a Java representation of Erlang integral types.
  */
 public class OtpErlangInt extends OtpErlangLong implements Serializable,
-        Cloneable {
+	Cloneable {
     // don't change this!
     static final long serialVersionUID = 1229430977614805556L;
 
@@ -32,10 +32,10 @@ public class OtpErlangInt extends OtpErlangLong implements Serializable,
      * Create an Erlang integer from the given value.
      * 
      * @param i
-     *            the int value to use.
+     *                the int value to use.
      */
     public OtpErlangInt(final int i) {
-        super(i);
+	super(i);
     }
 
     /**
@@ -43,19 +43,19 @@ public class OtpErlangInt extends OtpErlangLong implements Serializable,
      * Erlang external format.
      * 
      * @param buf
-     *            the stream containing the encoded value.
+     *                the stream containing the encoded value.
      * 
      * @exception OtpErlangDecodeException
-     *                if the buffer does not contain a valid external
-     *                representation of an Erlang integer.
+     *                    if the buffer does not contain a valid external
+     *                    representation of an Erlang integer.
      * 
      * @exception OtpErlangRangeException
-     *                if the value is too large to be represented as an int.
+     *                    if the value is too large to be represented as an int.
      */
     public OtpErlangInt(final OtpInputStream buf)
-            throws OtpErlangRangeException, OtpErlangDecodeException {
-        super(buf);
+	    throws OtpErlangRangeException, OtpErlangDecodeException {
+	super(buf);
 
-        final int j = intValue();
+	final int j = intValue();
     }
 }

@@ -26,13 +26,13 @@ public abstract class OtpException extends Exception {
      * Provides no message.
      */
     public OtpException() {
-        super();
+	super();
     }
 
     /**
      * Provides a detailed message.
      */
     public OtpException(final String msg) {
-        super(msg);
+	super(msg);
     }
 }

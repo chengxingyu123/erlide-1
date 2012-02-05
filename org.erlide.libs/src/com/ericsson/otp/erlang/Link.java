@@ -25,34 +25,33 @@ class Link {
     private int hashCodeValue = 0;
 
     public Link(final OtpErlangPid local, final OtpErlangPid remote) {
-        this.local = local;
-        this.remote = remote;
+	this.local = local;
+	this.remote = remote;
     }
 
     public OtpErlangPid local() {
-        return local;
+	return local;
     }
 
     public OtpErlangPid remote() {
-        return remote;
+	return remote;
     }
 
     public boolean contains(final OtpErlangPid pid) {
-        return local.equals(pid) || remote.equals(pid);
+	return local.equals(pid) || remote.equals(pid);
     }
 
     public boolean equals(final OtpErlangPid local, final OtpErlangPid remote) {
-        return this.local.equals(local) && this.remote.equals(remote)
-                || this.local.equals(remote) && this.remote.equals(local);
+	return this.local.equals(local) && this.remote.equals(remote)
+		|| this.local.equals(remote) && this.remote.equals(local);
     }
-
-    @Override
+    
     public int hashCode() {
-        if (hashCodeValue == 0) {
-            final OtpErlangObject.Hash hash = new OtpErlangObject.Hash(5);
-            hash.combine(local.hashCode() + remote.hashCode());
-            hashCodeValue = hash.valueOf();
-        }
-        return hashCodeValue;
+	if (hashCodeValue == 0) {
+	    OtpErlangObject.Hash hash = new OtpErlangObject.Hash(5);
+	    hash.combine(local.hashCode() + remote.hashCode());
+	    hashCodeValue = hash.valueOf();
+	}
+	return hashCodeValue;
     }
 }

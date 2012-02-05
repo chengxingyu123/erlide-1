@@ -8,6 +8,8 @@ init() ->
 	spawn(fun()->
 				  erlide_scanner_listener:start(),
 				  object:start(),
+				  resource_pool:start(),
+				  loadtest:test(load,10),
 				  ok
 		  end),
 	ok.

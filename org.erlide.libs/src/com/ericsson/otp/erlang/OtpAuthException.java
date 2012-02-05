@@ -32,6 +32,6 @@ public class OtpAuthException extends OtpException {
      * Provides a detailed message.
      */
     public OtpAuthException(final String s) {
-        super(s);
+	super(s);
     }
 }

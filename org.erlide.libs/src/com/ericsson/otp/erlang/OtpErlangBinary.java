@@ -25,7 +25,7 @@ import java.io.Serializable;
  * represented as a sequence of bytes can be made into an Erlang binary.
  */
 public class OtpErlangBinary extends OtpErlangBitstr implements Serializable,
-        Cloneable {
+	Cloneable {
     // don't change this!
     static final long serialVersionUID = -3781009633593609217L;
 
@@ -33,10 +33,10 @@ public class OtpErlangBinary extends OtpErlangBitstr implements Serializable,
      * Create a binary from a byte array
      * 
      * @param bin
-     *            the array of bytes from which to create the binary.
+     *                the array of bytes from which to create the binary.
      */
     public OtpErlangBinary(final byte[] bin) {
-        super(bin);
+	super(bin);
     }
 
     /**
@@ -44,17 +44,17 @@ public class OtpErlangBinary extends OtpErlangBitstr implements Serializable,
      * external format.
      * 
      * @param buf
-     *            the stream containing the encoded binary.
+     *                the stream containing the encoded binary.
      * 
      * @exception OtpErlangDecodeException
-     *                if the buffer does not contain a valid external
-     *                representation of an Erlang binary.
+     *                    if the buffer does not contain a valid external
+     *                    representation of an Erlang binary.
      */
     public OtpErlangBinary(final OtpInputStream buf)
-            throws OtpErlangDecodeException {
-        super(new byte[0]);
-        bin = buf.read_binary();
-        pad_bits = 0;
+	    throws OtpErlangDecodeException {
+	super(new byte[0]);
+	bin = buf.read_binary();
+	pad_bits = 0;
     }
 
     /**
@@ -62,27 +62,27 @@ public class OtpErlangBinary extends OtpErlangBitstr implements Serializable,
      * java.io.Serializable or java.io.Externalizable.
      * 
      * @param o
-     *            the object to serialize and create this binary from.
+     *                the object to serialize and create this binary from.
      */
     public OtpErlangBinary(final Object o) {
-        super(o);
+	super(o);
     }
 
     /**
      * Convert this binary to the equivalent Erlang external representation.
      * 
      * @param buf
-     *            an output stream to which the encoded binary should be
-     *            written.
+     *                an output stream to which the encoded binary should be
+     *                written.
      */
     @Override
     public void encode(final OtpOutputStream buf) {
-        buf.write_binary(bin);
+	buf.write_binary(bin);
     }
 
     @Override
     public Object clone() {
-        final OtpErlangBinary that = (OtpErlangBinary) super.clone();
-        return that;
+	final OtpErlangBinary that = (OtpErlangBinary) super.clone();
+	return that;
     }
 }

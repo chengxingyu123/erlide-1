@@ -97,45 +97,44 @@ public class AbstractNode {
     int distLow = 5; // Cannot talk to nodes before R6
     int creation = 0;
     int flags = dFlagExtendedReferences | dFlagExtendedPidsPorts
-            | dFlagBitBinaries | dFlagNewFloats | dFlagFunTags
-            | dflagNewFunTags;
+	    | dFlagBitBinaries | dFlagNewFloats | dFlagFunTags
+	    | dflagNewFunTags;
 
     /* initialize hostname and default cookie */
     static {
-        try {
-            localHost = InetAddress.getLocalHost().getHostName();
-            /*
-             * Make sure it's a short name, i.e. strip of everything after first
-             * '.'
-             */
-            final int dot = localHost.indexOf(".");
-            if (dot != -1) {
-                localHost = localHost.substring(0, dot);
-            }
-        } catch (final UnknownHostException e) {
-            localHost = "localhost";
-        }
+	try {
+	    localHost = InetAddress.getLocalHost().getHostName();
+	    /*
+	     * Make sure it's a short name, i.e. strip of everything after first
+	     * '.'
+	     */
+	    final int dot = localHost.indexOf(".");
+	    if (dot != -1) {
+		localHost = localHost.substring(0, dot);
+	    }
+	} catch (final UnknownHostException e) {
+	    localHost = "localhost";
+	}
 
-        final String dotCookieFilename = System.getProperty("user.home")
-                + File.separator + ".erlang.cookie";
-        BufferedReader br = null;
+	final String dotCookieFilename = System.getProperty("user.home")
+		+ File.separator + ".erlang.cookie";
+	BufferedReader br = null;
 
-        try {
-            final File dotCookieFile = new File(dotCookieFilename);
+	try {
+	    final File dotCookieFile = new File(dotCookieFilename);
 
-            br = new BufferedReader(new FileReader(dotCookieFile));
-            final String line = br.readLine();
-            defaultCookie = line != null ? line.trim() : line;
-        } catch (final IOException e) {
-            defaultCookie = "";
-        } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-            } catch (final IOException e) {
-            }
-        }
+	    br = new BufferedReader(new FileReader(dotCookieFile));
+	    defaultCookie = br.readLine().trim();
+	} catch (final IOException e) {
+	    defaultCookie = "";
+	} finally {
+	    try {
+		if (br != null) {
+		    br.close();
+		}
+	    } catch (final IOException e) {
+	    }
+	}
     }
 
     protected AbstractNode() {
@@ -145,29 +144,29 @@ public class AbstractNode {
      * Create a node with the given name and the default cookie.
      */
     protected AbstractNode(final String node) {
-        this(node, defaultCookie);
+	this(node, defaultCookie);
     }
 
     /**
      * Create a node with the given name and cookie.
      */
     protected AbstractNode(final String name, final String cookie) {
-        this.cookie = cookie;
+	this.cookie = cookie;
 
-        final int i = name.indexOf('@', 0);
-        if (i < 0) {
-            alive = name;
-            host = localHost;
-        } else {
-            alive = name.substring(0, i);
-            host = name.substring(i + 1, name.length());
-        }
+	final int i = name.indexOf('@', 0);
+	if (i < 0) {
+	    alive = name;
+	    host = localHost;
+	} else {
+	    alive = name.substring(0, i);
+	    host = name.substring(i + 1, name.length());
+	}
 
-        if (alive.length() > 0xff) {
-            alive = alive.substring(0, 0xff);
-        }
+	if (alive.length() > 0xff) {
+	    alive = alive.substring(0, 0xff);
+	}
 
-        node = alive + "@" + host;
+	node = alive + "@" + host;
     }
 
     /**
@@ -176,7 +175,7 @@ public class AbstractNode {
      * @return the name of the node represented by this object.
      */
     public String node() {
-        return node;
+	return node;
     }
 
     /**
@@ -187,7 +186,7 @@ public class AbstractNode {
      * @return the hostname component of the nodename.
      */
     public String host() {
-        return host;
+	return host;
     }
 
     /**
@@ -198,7 +197,7 @@ public class AbstractNode {
      * @return the alivename component of the nodename.
      */
     public String alive() {
-        return alive;
+	return alive;
     }
 
     /**
@@ -207,32 +206,32 @@ public class AbstractNode {
      * @return the authorization cookie used by this node.
      */
     public String cookie() {
-        return cookie;
+	return cookie;
     }
 
     // package scope
     int type() {
-        return ntype;
+	return ntype;
     }
 
     // package scope
     int distHigh() {
-        return distHigh;
+	return distHigh;
     }
 
     // package scope
     int distLow() {
-        return distLow;
+	return distLow;
     }
 
     // package scope: useless information?
     int proto() {
-        return proto;
+	return proto;
     }
 
     // package scope
     int creation() {
-        return creation;
+	return creation;
     }
 
     /**
@@ -241,13 +240,13 @@ public class AbstractNode {
      * @return the previous authorization cookie used by this node.
      */
     public String setCookie(final String cookie) {
-        final String prev = this.cookie;
-        this.cookie = cookie;
-        return prev;
+	final String prev = this.cookie;
+	this.cookie = cookie;
+	return prev;
     }
 
     @Override
     public String toString() {
-        return node();
+	return node();
     }
 }

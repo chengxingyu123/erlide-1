@@ -65,40 +65,40 @@ public class OtpSelf extends OtpLocalNode {
      * </p>
      * 
      * @param node
-     *            the name of this node.
+     *                the name of this node.
      * 
      */
     public OtpSelf(final String node) throws IOException {
-        this(node, defaultCookie, 0);
+	this(node, defaultCookie, 0);
     }
 
     /**
      * Create a self node.
      * 
      * @param node
-     *            the name of this node.
+     *                the name of this node.
      * 
      * @param cookie
-     *            the authorization cookie that will be used by this node when
-     *            it communicates with other nodes.
+     *                the authorization cookie that will be used by this node
+     *                when it communicates with other nodes.
      */
     public OtpSelf(final String node, final String cookie) throws IOException {
-        this(node, cookie, 0);
+	this(node, cookie, 0);
     }
 
     public OtpSelf(final String node, final String cookie, final int port)
-            throws IOException {
-        super(node, cookie);
+	    throws IOException {
+	super(node, cookie);
 
-        sock = new ServerSocket(port);
+	sock = new ServerSocket(port);
 
-        if (port != 0) {
-            this.port = port;
-        } else {
-            this.port = sock.getLocalPort();
-        }
+	if (port != 0) {
+	    this.port = port;
+	} else {
+	    this.port = sock.getLocalPort();
+	}
 
-        pid = createPid();
+	pid = createPid();
     }
 
     /**
@@ -111,7 +111,7 @@ public class OtpSelf extends OtpLocalNode {
      *         anonymous messages sent by this node.
      */
     public OtpErlangPid pid() {
-        return pid;
+	return pid;
     }
 
     /**
@@ -135,15 +135,15 @@ public class OtpSelf extends OtpLocalNode {
      *         already registered.
      * 
      * @exception java.io.IOException
-     *                if the port mapper could not be contacted.
+     *                    if the port mapper could not be contacted.
      */
     public boolean publishPort() throws IOException {
-        if (getEpmd() != null) {
-            return false; // already published
-        }
+	if (getEpmd() != null) {
+	    return false; // already published
+	}
 
-        OtpEpmd.publishPort(this);
-        return getEpmd() != null;
+	OtpEpmd.publishPort(this);
+	return getEpmd() != null;
     }
 
     /**
@@ -151,17 +151,17 @@ public class OtpSelf extends OtpLocalNode {
      * mapper, thus preventing any new connections from remote nodes.
      */
     public void unPublishPort() {
-        // unregister with epmd
-        OtpEpmd.unPublishPort(this);
+	// unregister with epmd
+	OtpEpmd.unPublishPort(this);
 
-        // close the local descriptor (if we have one)
-        try {
-            if (super.epmd != null) {
-                super.epmd.close();
-            }
-        } catch (final IOException e) {/* ignore close errors */
-        }
-        super.epmd = null;
+	// close the local descriptor (if we have one)
+	try {
+	    if (super.epmd != null) {
+		super.epmd.close();
+	    }
+	} catch (final IOException e) {/* ignore close errors */
+	}
+	super.epmd = null;
     }
 
     /**
@@ -171,51 +171,51 @@ public class OtpSelf extends OtpLocalNode {
      * @return a connection to a remote node.
      * 
      * @exception java.io.IOException
-     *                if a remote node attempted to connect but no common
-     *                protocol was found.
+     *                    if a remote node attempted to connect but no common
+     *                    protocol was found.
      * 
      * @exception OtpAuthException
-     *                if a remote node attempted to connect, but was not
-     *                authorized to connect.
+     *                    if a remote node attempted to connect, but was not
+     *                    authorized to connect.
      */
     public OtpConnection accept() throws IOException, OtpAuthException {
-        Socket newsock = null;
+	Socket newsock = null;
 
-        while (true) {
-            try {
-                newsock = sock.accept();
-                return new OtpConnection(this, newsock);
-            } catch (final IOException e) {
-                try {
-                    if (newsock != null) {
-                        newsock.close();
-                    }
-                } catch (final IOException f) {/* ignore close errors */
-                }
-                throw e;
-            }
-        }
+	while (true) {
+	    try {
+		newsock = sock.accept();
+		return new OtpConnection(this, newsock);
+	    } catch (final IOException e) {
+		try {
+		    if (newsock != null) {
+			newsock.close();
+		    }
+		} catch (final IOException f) {/* ignore close errors */
+		}
+		throw e;
+	    }
+	}
     }
 
     /**
      * Open a connection to a remote node.
      * 
      * @param other
-     *            the remote node to which you wish to connect.
+     *                the remote node to which you wish to connect.
      * 
      * @return a connection to the remote node.
      * 
      * @exception java.net.UnknownHostException
-     *                if the remote host could not be found.
+     *                    if the remote host could not be found.
      * 
      * @exception java.io.IOException
-     *                if it was not possible to connect to the remote node.
+     *                    if it was not possible to connect to the remote node.
      * 
      * @exception OtpAuthException
-     *                if the connection was refused by the remote node.
+     *                    if the connection was refused by the remote node.
      */
     public OtpConnection connect(final OtpPeer other) throws IOException,
-            UnknownHostException, OtpAuthException {
-        return new OtpConnection(this, other);
+	    UnknownHostException, OtpAuthException {
+	return new OtpConnection(this, other);
     }
 }

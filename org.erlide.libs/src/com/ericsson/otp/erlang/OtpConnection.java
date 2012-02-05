@@ -64,11 +64,11 @@ public class OtpConnection extends AbstractConnection {
      */
     // package scope
     OtpConnection(final OtpSelf self, final Socket s) throws IOException,
-            OtpAuthException {
-        super(self, s);
-        this.self = self;
-        queue = new GenericQueue();
-        start();
+	    OtpAuthException {
+	super(self, s);
+	this.self = self;
+	queue = new GenericQueue();
+	start();
     }
 
     /*
@@ -82,21 +82,21 @@ public class OtpConnection extends AbstractConnection {
      */
     // package scope
     OtpConnection(final OtpSelf self, final OtpPeer other) throws IOException,
-            OtpAuthException {
-        super(self, other);
-        this.self = self;
-        queue = new GenericQueue();
-        start();
+	    OtpAuthException {
+	super(self, other);
+	this.self = self;
+	queue = new GenericQueue();
+	start();
     }
 
     @Override
     public void deliver(final Exception e) {
-        queue.put(e);
+	queue.put(e);
     }
 
     @Override
     public void deliver(final OtpMsg msg) {
-        queue.put(msg);
+	queue.put(msg);
     }
 
     /**
@@ -105,7 +105,7 @@ public class OtpConnection extends AbstractConnection {
      * @return the {@link OtpPeer Node} representing the peer node.
      */
     public OtpPeer peer() {
-        return peer;
+	return peer;
     }
 
     /**
@@ -114,7 +114,7 @@ public class OtpConnection extends AbstractConnection {
      * @return the {@link OtpSelf Node} representing the local node.
      */
     public OtpSelf self() {
-        return self;
+	return self;
     }
 
     /**
@@ -122,7 +122,7 @@ public class OtpConnection extends AbstractConnection {
      * this connection.
      */
     public int msgCount() {
-        return queue.getCount();
+	return queue.getCount();
     }
 
     /**
@@ -136,25 +136,25 @@ public class OtpConnection extends AbstractConnection {
      * @return an object containing a single Erlang term.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node.
+     *                    if an exit signal is received from a process on the
+     *                    peer node.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      */
     public OtpErlangObject receive() throws IOException, OtpErlangExit,
-            OtpAuthException {
-        try {
-            return receiveMsg().getMsg();
-        } catch (final OtpErlangDecodeException e) {
-            close();
-            throw new IOException(e.getMessage());
-        }
+	    OtpAuthException {
+	try {
+	    return receiveMsg().getMsg();
+	} catch (final OtpErlangDecodeException e) {
+	    close();
+	    throw new IOException(e.getMessage());
+	}
     }
 
     /**
@@ -167,36 +167,36 @@ public class OtpConnection extends AbstractConnection {
      * connection is closed and the method throws an exception.
      * 
      * @param timeout
-     *            the time in milliseconds that this operation will block.
-     *            Specify 0 to poll the queue.
+     *                the time in milliseconds that this operation will block.
+     *                Specify 0 to poll the queue.
      * 
      * @return an object containing a single Erlang term.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node.
+     *                    if an exit signal is received from a process on the
+     *                    peer node.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      * 
      * @exception InterruptedException
-     *                if no message if the method times out before a message
-     *                becomes available.
+     *                    if no message if the method times out before a message
+     *                    becomes available.
      */
     public OtpErlangObject receive(final long timeout)
-            throws InterruptedException, IOException, OtpErlangExit,
-            OtpAuthException {
-        try {
-            return receiveMsg(timeout).getMsg();
-        } catch (final OtpErlangDecodeException e) {
-            close();
-            throw new IOException(e.getMessage());
-        }
+	    throws InterruptedException, IOException, OtpErlangExit,
+	    OtpAuthException {
+	try {
+	    return receiveMsg(timeout).getMsg();
+	} catch (final OtpErlangDecodeException e) {
+	    close();
+	    throw new IOException(e.getMessage());
+	}
     }
 
     /**
@@ -210,20 +210,21 @@ public class OtpConnection extends AbstractConnection {
      * @return an object containing a raw (still encoded) Erlang term.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node, or if the connection is lost for any reason.
+     *                    if an exit signal is received from a process on the
+     *                    peer node, or if the connection is lost for any
+     *                    reason.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      */
     public OtpInputStream receiveBuf() throws IOException, OtpErlangExit,
-            OtpAuthException {
-        return receiveMsg().getMsgBuf();
+	    OtpAuthException {
+	return receiveMsg().getMsgBuf();
     }
 
     /**
@@ -236,31 +237,32 @@ public class OtpConnection extends AbstractConnection {
      * connection is closed and the method throws an exception.
      * 
      * @param timeout
-     *            the time in milliseconds that this operation will block.
-     *            Specify 0 to poll the queue.
+     *                the time in milliseconds that this operation will block.
+     *                Specify 0 to poll the queue.
      * 
      * @return an object containing a raw (still encoded) Erlang term.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node, or if the connection is lost for any reason.
+     *                    if an exit signal is received from a process on the
+     *                    peer node, or if the connection is lost for any
+     *                    reason.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      * 
      * @exception InterruptedException
-     *                if no message if the method times out before a message
-     *                becomes available.
+     *                    if no message if the method times out before a message
+     *                    becomes available.
      */
     public OtpInputStream receiveBuf(final long timeout)
-            throws InterruptedException, IOException, OtpErlangExit,
-            OtpAuthException {
-        return receiveMsg(timeout).getMsgBuf();
+	    throws InterruptedException, IOException, OtpErlangExit,
+	    OtpAuthException {
+	return receiveMsg(timeout).getMsgBuf();
     }
 
     /**
@@ -270,32 +272,33 @@ public class OtpConnection extends AbstractConnection {
      *         the sender and recipient, as well as the actual message contents.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node, or if the connection is lost for any reason.
+     *                    if an exit signal is received from a process on the
+     *                    peer node, or if the connection is lost for any
+     *                    reason.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      */
     public OtpMsg receiveMsg() throws IOException, OtpErlangExit,
-            OtpAuthException {
-        final Object o = queue.get();
+	    OtpAuthException {
+	final Object o = queue.get();
 
-        if (o instanceof OtpMsg) {
-            return (OtpMsg) o;
-        } else if (o instanceof IOException) {
-            throw (IOException) o;
-        } else if (o instanceof OtpErlangExit) {
-            throw (OtpErlangExit) o;
-        } else if (o instanceof OtpAuthException) {
-            throw (OtpAuthException) o;
-        }
+	if (o instanceof OtpMsg) {
+	    return (OtpMsg) o;
+	} else if (o instanceof IOException) {
+	    throw (IOException) o;
+	} else if (o instanceof OtpErlangExit) {
+	    throw (OtpErlangExit) o;
+	} else if (o instanceof OtpAuthException) {
+	    throw (OtpAuthException) o;
+	}
 
-        return null;
+	return null;
     }
 
     /**
@@ -303,113 +306,114 @@ public class OtpConnection extends AbstractConnection {
      * method blocks at most for the specified time.
      * 
      * @param timeout
-     *            the time in milliseconds that this operation will block.
-     *            Specify 0 to poll the queue.
+     *                the time in milliseconds that this operation will block.
+     *                Specify 0 to poll the queue.
      * 
      * @return an {@link OtpMsg OtpMsg} containing the header information about
      *         the sender and recipient, as well as the actual message contents.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node, or if the connection is lost for any reason.
+     *                    if an exit signal is received from a process on the
+     *                    peer node, or if the connection is lost for any
+     *                    reason.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      * 
      * @exception InterruptedException
-     *                if no message if the method times out before a message
-     *                becomes available.
+     *                    if no message if the method times out before a message
+     *                    becomes available.
      */
     public OtpMsg receiveMsg(final long timeout) throws InterruptedException,
-            IOException, OtpErlangExit, OtpAuthException {
-        final Object o = queue.get(timeout);
+	    IOException, OtpErlangExit, OtpAuthException {
+	final Object o = queue.get(timeout);
 
-        if (o instanceof OtpMsg) {
-            return (OtpMsg) o;
-        } else if (o instanceof IOException) {
-            throw (IOException) o;
-        } else if (o instanceof OtpErlangExit) {
-            throw (OtpErlangExit) o;
-        } else if (o instanceof OtpAuthException) {
-            throw (OtpAuthException) o;
-        }
+	if (o instanceof OtpMsg) {
+	    return (OtpMsg) o;
+	} else if (o instanceof IOException) {
+	    throw (IOException) o;
+	} else if (o instanceof OtpErlangExit) {
+	    throw (OtpErlangExit) o;
+	} else if (o instanceof OtpAuthException) {
+	    throw (OtpAuthException) o;
+	}
 
-        return null;
+	return null;
     }
 
     /**
      * Send a message to a process on a remote node.
      * 
      * @param dest
-     *            the Erlang PID of the remote process.
+     *                the Erlang PID of the remote process.
      * @param msg
-     *            the message to send.
+     *                the message to send.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void send(final OtpErlangPid dest, final OtpErlangObject msg)
-            throws IOException {
-        // encode and send the message
-        super.sendBuf(self.pid(), dest, new OtpOutputStream(msg));
+	    throws IOException {
+	// encode and send the message
+	super.sendBuf(self.pid(), dest, new OtpOutputStream(msg));
     }
 
     /**
      * Send a message to a named process on a remote node.
      * 
      * @param dest
-     *            the name of the remote process.
+     *                the name of the remote process.
      * @param msg
-     *            the message to send.
+     *                the message to send.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void send(final String dest, final OtpErlangObject msg)
-            throws IOException {
-        // encode and send the message
-        super.sendBuf(self.pid(), dest, new OtpOutputStream(msg));
+	    throws IOException {
+	// encode and send the message
+	super.sendBuf(self.pid(), dest, new OtpOutputStream(msg));
     }
 
     /**
      * Send a pre-encoded message to a named process on a remote node.
      * 
      * @param dest
-     *            the name of the remote process.
+     *                the name of the remote process.
      * @param payload
-     *            the encoded message to send.
+     *                the encoded message to send.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void sendBuf(final String dest, final OtpOutputStream payload)
-            throws IOException {
-        super.sendBuf(self.pid(), dest, payload);
+	    throws IOException {
+	super.sendBuf(self.pid(), dest, payload);
     }
 
     /**
      * Send a pre-encoded message to a process on a remote node.
      * 
      * @param dest
-     *            the Erlang PID of the remote process.
+     *                the Erlang PID of the remote process.
      * @param msg
-     *            the encoded message to send.
+     *                the encoded message to send.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void sendBuf(final OtpErlangPid dest, final OtpOutputStream payload)
-            throws IOException {
-        super.sendBuf(self.pid(), dest, payload);
+	    throws IOException {
+	super.sendBuf(self.pid(), dest, payload);
     }
 
     /**
@@ -426,21 +430,21 @@ public class OtpConnection extends AbstractConnection {
      * </p>
      * 
      * @param mod
-     *            the name of the Erlang module containing the function to be
-     *            called.
+     *                the name of the Erlang module containing the function to
+     *                be called.
      * @param fun
-     *            the name of the function to call.
+     *                the name of the function to call.
      * @param args
-     *            an array of Erlang terms, to be used as arguments to the
-     *            function.
+     *                an array of Erlang terms, to be used as arguments to the
+     *                function.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void sendRPC(final String mod, final String fun,
-            final OtpErlangObject[] args) throws IOException {
-        sendRPC(mod, fun, new OtpErlangList(args));
+	    final OtpErlangObject[] args) throws IOException {
+	sendRPC(mod, fun, new OtpErlangList(args));
     }
 
     /**
@@ -457,35 +461,35 @@ public class OtpConnection extends AbstractConnection {
      * </p>
      * 
      * @param mod
-     *            the name of the Erlang module containing the function to be
-     *            called.
+     *                the name of the Erlang module containing the function to
+     *                be called.
      * @param fun
-     *            the name of the function to call.
+     *                the name of the function to call.
      * @param args
-     *            a list of Erlang terms, to be used as arguments to the
-     *            function.
+     *                a list of Erlang terms, to be used as arguments to the
+     *                function.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void sendRPC(final String mod, final String fun,
-            final OtpErlangList args) throws IOException {
-        final OtpErlangObject[] rpc = new OtpErlangObject[2];
-        final OtpErlangObject[] call = new OtpErlangObject[5];
+	    final OtpErlangList args) throws IOException {
+	final OtpErlangObject[] rpc = new OtpErlangObject[2];
+	final OtpErlangObject[] call = new OtpErlangObject[5];
 
-        /* {self, { call, Mod, Fun, Args, user}} */
+	/* {self, { call, Mod, Fun, Args, user}} */
 
-        call[0] = new OtpErlangAtom("call");
-        call[1] = new OtpErlangAtom(mod);
-        call[2] = new OtpErlangAtom(fun);
-        call[3] = args;
-        call[4] = new OtpErlangAtom("user");
+	call[0] = new OtpErlangAtom("call");
+	call[1] = new OtpErlangAtom(mod);
+	call[2] = new OtpErlangAtom(fun);
+	call[3] = args;
+	call[4] = new OtpErlangAtom("user");
 
-        rpc[0] = self.pid();
-        rpc[1] = new OtpErlangTuple(call);
+	rpc[0] = self.pid();
+	rpc[1] = new OtpErlangTuple(call);
 
-        send("rex", new OtpErlangTuple(rpc));
+	send("rex", new OtpErlangTuple(rpc));
     }
 
     /**
@@ -502,30 +506,30 @@ public class OtpConnection extends AbstractConnection {
      *         performed.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      * 
      * @exception OtpErlangExit
-     *                if an exit signal is received from a process on the peer
-     *                node.
+     *                    if an exit signal is received from a process on the
+     *                    peer node.
      * 
      * @exception OtpAuthException
-     *                if the remote node sends a message containing an invalid
-     *                cookie.
+     *                    if the remote node sends a message containing an
+     *                    invalid cookie.
      */
     public OtpErlangObject receiveRPC() throws IOException, OtpErlangExit,
-            OtpAuthException {
+	    OtpAuthException {
 
-        final OtpErlangObject msg = receive();
+	final OtpErlangObject msg = receive();
 
-        if (msg instanceof OtpErlangTuple) {
-            final OtpErlangTuple t = (OtpErlangTuple) msg;
-            if (t.arity() == 2) {
-                return t.elementAt(1); // obs: second element
-            }
-        }
+	if (msg instanceof OtpErlangTuple) {
+	    final OtpErlangTuple t = (OtpErlangTuple) msg;
+	    if (t.arity() == 2) {
+		return t.elementAt(1); // obs: second element
+	    }
+	}
 
-        return null;
+	return null;
     }
 
     /**
@@ -535,46 +539,46 @@ public class OtpConnection extends AbstractConnection {
      * {@link #unlink unlink()} to remove the link.
      * 
      * @param dest
-     *            the Erlang PID of the remote process.
+     *                the Erlang PID of the remote process.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void link(final OtpErlangPid dest) throws IOException {
-        super.sendLink(self.pid(), dest);
+	super.sendLink(self.pid(), dest);
     }
 
     /**
      * Remove a link between the local node and the specified process on the
-     * remote node. This method deactivates links created with {@link #link
-     * link()}.
+     * remote node. This method deactivates links created with
+     * {@link #link link()}.
      * 
      * @param dest
-     *            the Erlang PID of the remote process.
+     *                the Erlang PID of the remote process.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void unlink(final OtpErlangPid dest) throws IOException {
-        super.sendUnlink(self.pid(), dest);
+	super.sendUnlink(self.pid(), dest);
     }
 
     /**
      * Send an exit signal to a remote process.
      * 
      * @param dest
-     *            the Erlang PID of the remote process.
+     *                the Erlang PID of the remote process.
      * @param reason
-     *            an Erlang term describing the exit reason.
+     *                an Erlang term describing the exit reason.
      * 
      * @exception java.io.IOException
-     *                if the connection is not active or a communication error
-     *                occurs.
+     *                    if the connection is not active or a communication
+     *                    error occurs.
      */
     public void exit(final OtpErlangPid dest, final OtpErlangObject reason)
-            throws IOException {
-        super.sendExit2(self.pid(), dest, reason);
+	    throws IOException {
+	super.sendExit2(self.pid(), dest, reason);
     }
 }

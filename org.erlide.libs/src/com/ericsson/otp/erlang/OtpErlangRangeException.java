@@ -37,6 +37,6 @@ public class OtpErlangRangeException extends OtpErlangException {
      * Provides a detailed message.
      */
     public OtpErlangRangeException(final String msg) {
-        super(msg);
+	super(msg);
     }
 }
