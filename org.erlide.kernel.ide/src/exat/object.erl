@@ -112,6 +112,8 @@ delete(Object) when is_record(Object,object) ->
 %% 	io:format("After d_tor executor ~w\n", [Object]),
 	%%delete all related KB facts 	
 	eresye:retract_match(object_store, {object,Object,'_','_'}),
+%%TODO: get it work
+%%  	erlide_jrpc:event(objectlist, {erlang:now(), self()}),
 %% 	io:format("After retract_match~w\n", [Object]),
 	ok;
 delete([Object|T]) -> delete(Object), delete(T);
@@ -272,13 +274,28 @@ nameof(ObjectList) when is_list(ObjectList) ->
 	[get(X,name)||X <- ObjectList].
 
 %%
-%%  get the executor of the object or a list of objects
-%%  return the executor which is pid  
+%%  get the property_server  of the object or a list of objects
+%%  return the property_server which is pid  
 property_server_of(Object) when is_atom(Object) -> property_server_of(get_by_name(Object));
 property_server_of(Object) when is_record(Object,object) ->
     Object#object.property_server;
 property_server_of(ObjectList) when is_list(ObjectList) ->
 	[X#object.property_server||X <- ObjectList].
+
+
+%%
+%%  get the state of the object or a list of objects
+%%  return the state or state list  
+stateof(Object) when is_atom(Object) -> stateof(get_by_name(Object));
+stateof(Object) when is_record(Object,object) ->
+    get(Object,?PROPERTY_STATUS);
+stateof(ObjectList) when is_list(ObjectList) ->
+	[get(X,?PROPERTY_STATUS)||X <- ObjectList].
+
+total_mem(Object) ->
+	{memory,PropMem} = erlang:process_info(property_server_of(Object), memory),
+	{memory,ExeMem} = erlang:process_info(executorof(Object), memory),
+    PropMem+ExeMem. 
 
 %%
 %% reflection API
@@ -728,16 +745,12 @@ get_by_name([Value|T],Acc) ->
 	get_by_name(T,[get_by_name(Value,Acc)|Acc]);
 get_by_name([],Acc) -> Acc.
 
-%%
-%% check if the name is available
-%% return true or false
-%%
-check_name(Value) ->
+isValidName(Value) ->
 	case get_by_name(Value) of
-		[] -> available;
-		_ -> not_available
+		[] -> false;
+		_ -> true
 	end.
-
+	
 %%
 %% get the defined attributes, not shown the system attributes
 %% return a proplists.
@@ -774,3 +787,12 @@ delete_all() ->
 	object:delete(object:get_all()),
 	eresye:retract_match(object_store, {object,'_','_','_'}), 
 	ok.
+
+object_store_updater() ->
+	receive
+		stop -> ok;
+		_ -> object_store_updater()
+		after 5000 ->
+			erlide_jrpc:event(objectstore, {erlang:now(), self()}),
+			object_store_updater()
+	end.

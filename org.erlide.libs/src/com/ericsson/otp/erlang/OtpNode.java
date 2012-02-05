@@ -250,7 +250,7 @@ public class OtpNode extends OtpLocalNode {
      * sent to this mailbox by using its registered name or the associated
      * {@link OtpMbox#self pid}.
      * 
-     * @param name
+     * @param Name
      *            a name to register for this mailbox. The name must be unique
      *            within this OtpNode.
      * 
@@ -270,7 +270,7 @@ public class OtpNode extends OtpLocalNode {
      * supercede that name.
      * </p>
      * 
-     * @param name
+     * @param Name
      *            the name to register for the mailbox. Specify null to
      *            unregister the existing name from this mailbox.
      * 

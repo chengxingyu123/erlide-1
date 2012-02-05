@@ -129,7 +129,7 @@ public class OtpMbox {
      * supercede that name.
      * </p>
      * 
-     * @param name
+     * @param Name
      *                the name to register for the mailbox. Specify null to
      *                unregister the existing name from this mailbox.
      * 
@@ -396,7 +396,7 @@ public class OtpMbox {
      * Send a message to a named mailbox created from the same node as this
      * mailbox.
      * 
-     * @param name
+     * @param Name
      *                the registered name of recipient mailbox.
      * 
      * @param msg
@@ -410,7 +410,7 @@ public class OtpMbox {
     /**
      * Send a message to a named mailbox created from another node.
      * 
-     * @param name
+     * @param Name
      *                the registered name of recipient mailbox.
      * 
      * @param node

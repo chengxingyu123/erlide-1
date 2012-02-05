@@ -49,7 +49,12 @@ update(Self,EventType,Pattern,State) ->
 	object:do(Self,logging).
 
 start(Name) ->
-	X = object:new(ping_monitor,[Name]),
-	object:start(X),
-	eresye:assert(Name,{wakeup}),
-	X.
+	case object:get_by_name(Name) of
+		[] -> 
+				X = object:new(?MODULE,[Name]),
+				object:start(X),
+				eresye:assert(Name,{wakeup}),
+				X;
+		_ -> atom_to_list(Name) ++ " already existed, choose a new name"
+	end.
+

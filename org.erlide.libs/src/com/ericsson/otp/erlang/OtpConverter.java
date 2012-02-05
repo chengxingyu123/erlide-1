@@ -86,8 +86,10 @@ public final class OtpConverter
 			} 
 	        else if(elem instanceof OtpErlangString)  return ((OtpErlangString)elem).stringValue();
 	        else if(elem instanceof OtpErlangLong)  return ((OtpErlangLong)elem).longValue();
-	        else if(elem instanceof OtpErlangAtom) {
+	        else if(elem instanceof OtpErlangAtom) {	            
 	        	String atomValue = ((OtpErlangAtom)elem).atomValue();
+	        	if ("true".equalsIgnoreCase(atomValue)) return true;
+	        	if ("false".equalsIgnoreCase(atomValue)) return false;
 	        	atomValueList.add(atomValue); 
 	        	return atomValue;
 	        }

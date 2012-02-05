@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2004 Vlad Dumitrescu and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Vlad Dumitrescu
- *******************************************************************************/
+//TODO: create an object, edit object in a seperate view
+
 package org.erlide.ui.views.objectlist;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -58,6 +54,8 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangPid;
 import com.ericsson.otp.erlang.OtpErlangString;
 import com.ericsson.otp.erlang.OtpErlangTuple;
+import com.siteview.object.ErlObject;
+import com.siteview.object.ErlObjectStore;
 
 /**
  * 
@@ -71,6 +69,7 @@ public class ObjectListView extends ViewPart {
     private ComboViewer backends;
     TableViewer viewer;
     private Action refreshAction;
+    private Action deleteAction;
     Action doubleClickAction;
 
     /*
@@ -101,25 +100,21 @@ public class ObjectListView extends ViewPart {
 
         @Override
         public Object[] getElements(final Object parent) {
-            final IBackend backend = getBackend();
-            if (backend == null) {
-                return new OtpErlangObject[] {};
-            }
 
-            final OtpErlangList r = Objectlist.getObjectList(backend);
-            if (r.arity() == 0) {
-                return new OtpErlangObject[] {};
+            List<ErlObject> erlObjList = new ArrayList<ErlObject>(); 
+            try {
+                if (ErlObjectStore.size() == 0) return null;
+                erlObjList = (List<ErlObject>) ErlObjectStore.get_all();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            final OtpErlangObject[] ss = new OtpErlangObject[r.elements().length];
-            final Object[] sss = new Object[r.elements().length];
-
-            for (int i = 0; i < r.elements().length; i++) {
-                final OtpErlangTuple e = (OtpErlangTuple) r.elementAt(i);
-                ss[i] = e;
-                sss[i]=OtpConverter.OtpErlangObject2Object(e);
+            
+            final Object[] sss = new Object[erlObjList.size()];
+            
+            for (int i = 0; i < erlObjList.size(); i++) {
+                sss[i] = erlObjList.get(i);
             }
-
-            return ss;
+            return sss;
         }
 
         class ObjectEventHandler extends ErlangEventHandler {
@@ -147,12 +142,18 @@ public class ObjectListView extends ViewPart {
 
         @Override
         public String getColumnText(final Object obj, final int index) {
-            final OtpErlangTuple t = (OtpErlangTuple) obj;
-            final OtpErlangObject e = t.elementAt(index + 1);
-            if (e instanceof OtpErlangString) {
-                return ((OtpErlangString) e).stringValue();
-            }
-            return e.toString();
+            final ErlObject erlObj = (ErlObject) obj ;
+            try {                    
+                    if (index == 0) return erlObj.getExecutor().toString();
+                    if (index == 1) return erlObj.getName();
+                    if (index == 2) return erlObj.getType();
+                    if (index == 3) return erlObj.getMem().toString();
+                    if (index == 4) return erlObj.get_defined_attrs().toString();
+                    if (index == 5) return erlObj.getState().toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            return null;
         }
 
         @Override
@@ -289,6 +290,7 @@ public class ObjectListView extends ViewPart {
 
     void fillContextMenu(final IMenuManager manager) {
         manager.add(refreshAction);
+        manager.add(deleteAction);
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
@@ -310,40 +312,51 @@ public class ObjectListView extends ViewPart {
         refreshAction.setImageDescriptor(PlatformUI.getWorkbench()
                 .getSharedImages()
                 .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+        
+        deleteAction = new Action() {
+
+            @Override
+            public void run() {
+                final ISelection selection = viewer.getSelection();
+                final ErlObject obj = (ErlObject) ((IStructuredSelection) selection)
+                        .getFirstElement();
+
+                if (obj == null) {
+                    return;
+                }
+                
+                try {
+                    ErlObjectStore.delete(obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                
+                viewer.refresh();
+            }
+        };
+        deleteAction.setText("Delete");
+        deleteAction.setToolTipText("Delete this object");
+        deleteAction.setImageDescriptor(PlatformUI.getWorkbench()
+                .getSharedImages()
+                .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
 
         doubleClickAction = new Action() {
 
             @Override
             public void run() {
                 final ISelection selection = viewer.getSelection();
-                final Object obj = ((IStructuredSelection) selection)
+                final ErlObject obj = (ErlObject) ((IStructuredSelection) selection)
                         .getFirstElement();
 
                 if (obj == null) {
                     return;
                 }
+                
+                MessageDialog.openInformation(viewer.getControl().getShell(),
+                        "Object detailed view", obj.getName());
 
-                final OtpErlangPid pid = (OtpErlangPid) ((OtpErlangTuple) obj)
-                        .elementAt(0);
+ 
 
-                final OtpErlangObject r = Objectlist.getObjectInfo(
-                        getBackend(), pid);
-                if (r instanceof OtpErlangList) {
-                    final OtpErlangList l = (OtpErlangList) r;
-                    final StringBuilder s = new StringBuilder();
-                    for (int i = 0; i < l.arity(); i++) {
-                        final OtpErlangTuple e = (OtpErlangTuple) l
-                                .elementAt(i);
-                        s.append(' ').append(e.elementAt(0).toString())
-                                .append("\t= ")
-                                .append(e.elementAt(1).toString()).append('\n');
-                    }
-                    showMessage(s.toString());
-                } else {
-                    showMessage("Process "
-                            + pid.toString()
-                            + " is probably dead.\nPlease refresh process list.");
-                }
             }
         };
     }

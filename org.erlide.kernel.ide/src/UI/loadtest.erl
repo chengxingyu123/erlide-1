@@ -21,7 +21,8 @@ do_action(Self, _, _, _) ->
 %% 	example_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
 %% 	atomic_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
 %% 	base_monitor:test(list_to_atom("monitor" ++ integer_to_list(C))),
-	point:test(list_to_atom("point" ++ integer_to_list(C))),
+	P = point:test(list_to_atom("point" ++ integer_to_list(C))),
+	object:set(P, 'X', C * random:uniform(10)),object:set(P, 'Y', C * random:uniform(10)),
 %% 	relativepoint:test(list_to_atom("relativepoint" ++ integer_to_list(C))),
  	io:format("[~w ] step ~w\n",[Self, C]),
 	Max = object:get(Self,max),
@@ -32,8 +33,8 @@ do_action(Self, _, _, _) ->
  end .
 
 test(Name,Max) ->
-	case object:check_name(Name) of
-		available -> X = object:new(?MODULE,[Name]),
+	case object:isValidName(Name) of
+		false -> X = object:new(?MODULE,[Name]),
 				Start = erlang:now(),
 				object:set(X,max,Max),
 				object:start(X),
@@ -44,5 +45,5 @@ test(Name,Max) ->
 				io:format(" total number of objects:~w in ~w seconds.\n",[length(object:get_all()),timer:now_diff(erlang:now(), Start)/1000000]),
 %% 				object:delete (X );
 				X;					 
-		_ -> atom_to_list(Name) ++ " not available, choose a new name"
+		true -> atom_to_list(Name) ++ " already exist, choose a new name"
 	end.
