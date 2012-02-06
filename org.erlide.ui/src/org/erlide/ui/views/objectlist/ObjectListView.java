@@ -1,4 +1,5 @@
 //TODO: create an object, edit object in a seperate view
+//TODO: use the PDE as editor
 
 package org.erlide.ui.views.objectlist;
 
