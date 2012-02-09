@@ -2,6 +2,7 @@
 -compile(export_all).
 -include("../../include/object.hrl").
 -include("../../include/monitor.hrl").
+%% test
 
 extends () -> atomic_monitor .
 
